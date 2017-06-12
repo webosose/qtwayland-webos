@@ -256,6 +256,7 @@ bool AppSnapshotManagerPrivate::dump()
                        << "reason=" << m_failureReason;
         m_state = state;
         m_failureReason = failureReason;
+        m_window->setScreen(NULL);
 
         return false;
     }
