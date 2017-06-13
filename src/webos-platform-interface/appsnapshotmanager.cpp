@@ -185,8 +185,6 @@ bool AppSnapshotManagerPrivate::initialize(const QString& appId, QWindow* w, con
 
     criue_set_appid(appId.toLocal8Bit().data());
     criue_set_comm(QCoreApplication::applicationName().toLocal8Bit().data());
-    criue_set_log_file("dump.log");
-    criue_set_log_level(4);
     criue_set_pid(getpid());
     criue_set_shell_job(true);
     criue_set_ext_unix_sk(true);
