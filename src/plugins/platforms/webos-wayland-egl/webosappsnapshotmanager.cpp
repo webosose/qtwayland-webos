@@ -17,6 +17,7 @@
 #include "webosappsnapshotmanager.h"
 #include "appsnapshotmanager_p.h"
 #include "qwaylandeglclientbufferintegration.h"
+#include "qwaylandeglinclude.h"
 
 #include <QDebug>
 #include <QSocketNotifier>
@@ -76,6 +77,11 @@ bool WebOSAppSnapshotManagerPrivate::preDumpInternal()
     if (!m_clientBufferIntegrationDestroyed) {
         destroyAndLeaveDangling(m_clientBufferIntegration);
         m_clientBufferIntegrationDestroyed = true;
+
+        typedef EGLBoolean (EGLAPIENTRYP EGLDESTRUCTORLOADERLG) (void);
+        EGLDESTRUCTORLOADERLG pEglDestructorLoaderLG = reinterpret_cast<EGLDESTRUCTORLOADERLG>(eglGetProcAddress("eglDestructorLoaderLG"));
+        if (pEglDestructorLoaderLG)
+            pEglDestructorLoaderLG();
     }
 
     if (!m_displayDestroyed) {
