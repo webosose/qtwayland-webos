@@ -18,6 +18,7 @@
 #include "appsnapshotmanager_p.h"
 #include "qwaylandeglclientbufferintegration.h"
 #include "qwaylandeglinclude.h"
+#include "webosintegration_p.h"
 
 #include <QDebug>
 #include <QSocketNotifier>
@@ -25,7 +26,6 @@
 #include <QtCore/qcoreapplication.h>
 #include <QtGui/private/qguiapplication_p.h>
 #include <QtWaylandClient/private/qwaylanddisplay_p.h>
-#include <QtWaylandClient/private/qwaylandintegration_p.h>
 #include <QtWaylandClient/private/qwaylandscreen_p.h>
 
 class WebOSAppSnapshotManagerPrivate : public AppSnapshotManagerPrivate
@@ -75,6 +75,9 @@ bool WebOSAppSnapshotManagerPrivate::preDumpInternal()
     Q_ASSERT(m_clientBufferIntegration);
 
     if (!m_clientBufferIntegrationDestroyed) {
+        WebOSIntegration* win = static_cast<WebOSIntegration*>(QGuiApplicationPrivate::platformIntegration());
+        win->resetInputContext();
+
         destroyAndLeaveDangling(m_clientBufferIntegration);
         m_clientBufferIntegrationDestroyed = true;
 
@@ -86,7 +89,7 @@ bool WebOSAppSnapshotManagerPrivate::preDumpInternal()
 
     if (!m_displayDestroyed) {
         QList<QWaylandScreen*> screens = m_display->screens();
-        QWaylandIntegration* win = static_cast<QWaylandIntegration*>(QGuiApplicationPrivate::platformIntegration());
+        WebOSIntegration* win = static_cast<WebOSIntegration*>(QGuiApplicationPrivate::platformIntegration());
         foreach (QWaylandScreen *screen, screens) {
             win->removeScreen(screen->screen());
             delete screen->screen();
@@ -122,7 +125,7 @@ void WebOSAppSnapshotManagerPrivate::recover()
 
     if (m_displayDestroyed) {
         connectToEventDispatcher(QGuiApplicationPrivate::eventDispatcher);
-        m_display = new (m_display) QWaylandDisplay(static_cast<QWaylandIntegration*>(QGuiApplicationPrivate::platformIntegration()));
+        m_display = new (m_display) QWaylandDisplay(static_cast<WebOSIntegration*>(QGuiApplicationPrivate::platformIntegration()));
         m_displayDestroyed = false;
     }
 
@@ -135,8 +138,8 @@ void WebOSAppSnapshotManagerPrivate::recover()
 
 void WebOSAppSnapshotManagerPrivate::initializeWaylandIntegration()
 {
-    QWaylandIntegration *wayland_integration = static_cast<QWaylandIntegration *>(QGuiApplicationPrivate::platformIntegration());
-    wayland_integration->initialize();
+    WebOSIntegration *integration = static_cast<WebOSIntegration*>(QGuiApplicationPrivate::platformIntegration());
+    integration->initialize();
 }
 
 void WebOSAppSnapshotManagerPrivate::connectToEventDispatcher(QAbstractEventDispatcher* dispatcher)

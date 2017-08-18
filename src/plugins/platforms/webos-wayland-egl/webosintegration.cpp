@@ -65,6 +65,13 @@ void WebOSIntegration::initialize()
     QWaylandIntegration::initialize();
 }
 
+#ifdef HAS_CRIU
+void WebOSIntegration::resetInputContext()
+{
+    mInputContext.reset();
+}
+#endif
+
 QPlatformWindow *WebOSIntegration::createPlatformWindow(QWindow *window) const
 {
     // If one of conditions below is not satisfied,

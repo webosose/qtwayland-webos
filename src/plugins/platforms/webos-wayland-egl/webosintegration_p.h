@@ -30,6 +30,10 @@ public:
 
     void initialize();
 
+#ifdef HAS_CRIU
+    void resetInputContext();
+#endif
+
     QPlatformWindow *createPlatformWindow(QWindow *window) const Q_DECL_OVERRIDE;
     QWaylandCursor *createPlatformCursor(QWaylandScreen *screen) const Q_DECL_OVERRIDE;
     QWaylandScreen *createPlatformScreen(QWaylandDisplay *display, int version, uint32_t id) const Q_DECL_OVERRIDE;
