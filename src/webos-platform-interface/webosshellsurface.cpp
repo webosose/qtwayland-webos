@@ -216,6 +216,10 @@ void WebOSShellSurfacePrivate::setProperty(const QString &name, const QVariant &
                 setKeyMask( WebOSShellSurface::KeyMaskExit | keyMask());
                 qWarning() << "_WEBOS_ACCESS_POLICY_KEYS_EXIT is deprecated, please use setKeyMask() instead";
             }
+            if (name == "_WEBOS_ACCESS_POLICY_KEYS_GUIDE") {
+                setKeyMask( WebOSShellSurface::KeyMaskGuide | keyMask());
+                qWarning() << "_WEBOS_ACCESS_POLICY_KEYS_GUIDE is deprecated, please use setKeyMask() instead";
+            }
         }
     }
 
