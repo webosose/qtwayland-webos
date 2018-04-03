@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2018 LG Electronics, Inc.
+# Copyright (c) 2013-2019 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ PKGCONFIG += wayland-webos-client wayland-client
 WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-webos/webos-surface-group.xml
 WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-webos/webos-input-manager.xml
 WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-webos/webos-extension.xml
+WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-webos/webos-foreign.xml
 
 SOURCES += \
     webosshellintegration.cpp \
@@ -35,7 +36,8 @@ SOURCES += \
     webossurfacegrouplayer.cpp \
     webosxinput.cpp \
     webosinputmanager.cpp \
-    webosinputpanellocator.cpp
+    webosinputpanellocator.cpp \
+    webosforeign.cpp
 
 PUBLICHEADERS = \
     webosplatform.h \
@@ -47,7 +49,8 @@ PUBLICHEADERS = \
     webosinputmanager.h \
     webosxinput.h \
     webosshellintegration.h \
-    webosinputpanellocator.h
+    webosinputpanellocator.h \
+    webosforeign.h
 
 HEADERS += \
     $$PUBLICHEADERS \
@@ -58,7 +61,8 @@ HEADERS += \
     webossurfacegroup_p.h \
     webossurfacegrouplayer_p.h \
     webosinputmanager_p.h \
-    webosinputpanellocator_p.h
+    webosinputpanellocator_p.h \
+    webosforeign_p.h
 
 criu {
     DEFINES += HAS_CRIU

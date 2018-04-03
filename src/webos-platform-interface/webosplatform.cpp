@@ -20,6 +20,7 @@
 #include "webosshell.h"
 #include "webosinputmanager.h"
 #include "webosinputpanellocator.h"
+#include "webosforeign.h"
 
 #include <QDebug>
 #include <QtGui/private/qguiapplication_p.h>
@@ -33,6 +34,7 @@ WebOSPlatformPrivate::WebOSPlatformPrivate()
     , m_groupCompositor(0)
     , m_inputManager(0)
     , m_display(0)
+    , m_foreign(0)
 #ifdef HAS_CRIU
     , m_appSnapshotManager(0)
 #endif
@@ -59,6 +61,8 @@ void WebOSPlatformPrivate::registry_global(void *data, struct wl_registry *regis
         p->m_groupCompositor = new WebOSSurfaceGroupCompositor(p->display(), id);
     } else if (interface == "wl_webos_input_manager") {
         p->m_inputManager = new WebOSInputManager(p->display(), id);
+    } else if (interface == "wl_webos_foreign") {
+        p->m_foreign = new WebOSForeign(p->display(), id);
     }
 }
 
@@ -112,6 +116,15 @@ WebOSInputManager* WebOSPlatform::inputManager()
 WebOSInputPanelLocator* WebOSPlatform::inputPanelLocator()
 {
     return WebOSInputPanelLocator::instance();
+}
+
+WebOSForeign* WebOSPlatform::foreign()
+{
+    Q_D(WebOSPlatform);
+    if (d->m_foreign)
+        return d->m_foreign;
+    qWarning("No WebOSForeign available");
+    return nullptr;
 }
 
 #ifdef HAS_CRIU
