@@ -118,7 +118,7 @@ WebOSInputPanelLocator* WebOSPlatform::inputPanelLocator()
     return WebOSInputPanelLocator::instance();
 }
 
-WebOSForeign* WebOSPlatform::foreign()
+WebOSForeign* WebOSPlatform::webOSForeign()
 {
     Q_D(WebOSPlatform);
     if (d->m_foreign)

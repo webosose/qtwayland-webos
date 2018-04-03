@@ -35,10 +35,10 @@ public:
     virtual ~WebOSForeignPrivate();
 
     WebOSExported* export_element(QWindow* window,
-                                  WebOSForeign::ExportedType exportedType);
+                                  WebOSForeign::WebOSExportedType exportedType);
 
     WebOSImported* import_element(const QString& windowId,
-                                  WebOSForeign::ExportedType exportedType);
+                                  WebOSForeign::WebOSExportedType exportedType);
 
     WebOSForeign *q_ptr;
     Q_DECLARE_PUBLIC(WebOSForeign);
@@ -57,7 +57,7 @@ public:
     void setExportedWindow(const QRegion &sourceRegion, const QRegion &destinationRegion);
 
     QString getWindowId();
-    WebOSForeign::ExportedType getExportedType();
+    WebOSForeign::WebOSExportedType getWebOSExportedType();
 
     static inline WebOSExportedPrivate* get(WebOSExported* exported) {
         return exported->d_func();
@@ -74,7 +74,7 @@ private:
     QRegion m_sourceRegion;
     QRegion m_destinationRegion;
     QString m_windowId;
-    WebOSForeign::ExportedType m_exportedType = WebOSForeign::VideoObject;
+    WebOSForeign::WebOSExportedType m_exportedType = WebOSForeign::VideoObject;
 
     friend class WebOSForeignPrivate;
 };
@@ -84,7 +84,7 @@ class WebOSImportedPrivate : public QObject, public QtWayland::wl_webos_imported
     Q_OBJECT
 public:
     WebOSImportedPrivate(const QString& windowId,
-                         WebOSForeign::ExportedType exportedType);
+                         WebOSForeign::WebOSExportedType exportedType);
     virtual ~WebOSImportedPrivate();
 
     void requestPunchThrough();
@@ -99,7 +99,7 @@ public:
 
 private:
     QString m_windowId;
-    WebOSForeign::ExportedType m_exportedType;
+    WebOSForeign::WebOSExportedType m_exportedType;
     friend class WebOSForeignPrivate;
 };
 

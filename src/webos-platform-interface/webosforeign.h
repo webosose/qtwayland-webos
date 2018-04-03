@@ -39,15 +39,15 @@ class WebOSForeign : public QObject {
     Q_OBJECT
 public:
 
-    enum ExportedType {
+    enum WebOSExportedType {
         VideoObject = 0, // Exported object is Video
         SubtitleObject = 1 // Exported object is Subtitle
     };
 
     ~WebOSForeign();
-    WebOSExported* export_element(QWindow* window, ExportedType exportedType);
+    WebOSExported* export_element(QWindow* window, WebOSExportedType exportedType);
     WebOSImported* import_element(const QString& windowId,
-                                  ExportedType exportedType);
+                                  WebOSExportedType exportedType);
 
 private:
     WebOSForeign(QWaylandDisplay* disp, uint32_t id);
@@ -66,10 +66,11 @@ public:
 
     void setExportedWindow(const QRegion &sourceRegion, const QRegion &destinationRegion);
     QString getWindowId();
-    WebOSForeign::ExportedType getExportedType();
+
+    WebOSForeign::WebOSExportedType getWebOSExportedType();
 
 signals:
-    void window_id_assigned(QString windowId, WebOSForeign::ExportedType type);
+    void windowIdAssigned(QString windowId, WebOSForeign::WebOSExportedType type);
 
 private:
     WebOSExported(QWindow* window);
@@ -90,7 +91,7 @@ public:
 
 private:
     WebOSImported(const QString& windowId,
-                  WebOSForeign::ExportedType exportedType);
+                  WebOSForeign::WebOSExportedType exportedType);
 
     QScopedPointer<WebOSImportedPrivate> d_ptr;
     Q_DECLARE_PRIVATE(WebOSImported);

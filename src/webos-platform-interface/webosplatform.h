@@ -50,7 +50,7 @@ public:
 
     WebOSInputPanelLocator* inputPanelLocator();
 
-    WebOSForeign* foreign();
+    WebOSForeign* webOSForeign();
 
 #ifdef HAS_CRIU
     AppSnapshotManager* appSnapshotManager();

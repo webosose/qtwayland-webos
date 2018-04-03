@@ -25,7 +25,6 @@
 #include "webosforeign.h"
 #include "webosforeign_p.h"
 
-
 WebOSForeignPrivate::WebOSForeignPrivate(QWaylandDisplay* display,
                                          uint32_t id)
     : QtWayland::wl_webos_foreign(display->wl_registry(), id, 1)
@@ -37,7 +36,7 @@ WebOSForeignPrivate::~WebOSForeignPrivate()
     q_ptr = NULL;
 }
 
-WebOSExported* WebOSForeignPrivate::export_element(QWindow* window, WebOSForeign::ExportedType exportedType)
+WebOSExported* WebOSForeignPrivate::export_element(QWindow* window, WebOSForeign::WebOSExportedType exportedType)
 {
     if (!isInitialized())
         return NULL;
@@ -51,7 +50,7 @@ WebOSExported* WebOSForeignPrivate::export_element(QWindow* window, WebOSForeign
 }
 
 WebOSImported* WebOSForeignPrivate::import_element(const QString& windowId,
-                          WebOSForeign::ExportedType exportedType)
+                          WebOSForeign::WebOSExportedType exportedType)
 {
     if (!isInitialized())
         return NULL;
@@ -75,14 +74,14 @@ WebOSForeign::~WebOSForeign()
 {
 }
 
-WebOSExported* WebOSForeign::export_element(QWindow* window, ExportedType exportedType)
+WebOSExported* WebOSForeign::export_element(QWindow* window, WebOSExportedType exportedType)
 {
     Q_D(WebOSForeign);
     return d->export_element(window, exportedType);
 }
 
 WebOSImported* WebOSForeign::import_element(const QString& windowId,
-                                            ExportedType exportedType)
+                                            WebOSExportedType exportedType)
 {
     Q_D(WebOSForeign);
     return d->import_element(windowId, exportedType);
@@ -131,7 +130,7 @@ QString WebOSExportedPrivate::getWindowId()
     return m_windowId;
 }
 
-WebOSForeign::ExportedType WebOSExportedPrivate::getExportedType()
+WebOSForeign::WebOSExportedType WebOSExportedPrivate::getWebOSExportedType()
 {
     return m_exportedType;
 }
@@ -141,8 +140,8 @@ void WebOSExportedPrivate::webos_exported_window_id_assigned(const QString &wind
     qInfo() << "window_id assigned:" << window_id;
     Q_Q(WebOSExported);
     m_windowId = window_id;
-    m_exportedType = static_cast<WebOSForeign::ExportedType>(exported_type);
-    q->window_id_assigned(m_windowId, m_exportedType);
+    m_exportedType = static_cast<WebOSForeign::WebOSExportedType>(exported_type);
+    q->windowIdAssigned(m_windowId, m_exportedType);
 }
 
 WebOSExported::WebOSExported(QWindow *window)
@@ -168,14 +167,14 @@ QString WebOSExported::getWindowId()
     return d->getWindowId();
 }
 
-WebOSForeign::ExportedType WebOSExported::getExportedType()
+WebOSForeign::WebOSExportedType WebOSExported::getWebOSExportedType()
 {
     Q_D(WebOSExported);
-    return d->getExportedType();
+    return d->getWebOSExportedType();
 }
 
 WebOSImportedPrivate::WebOSImportedPrivate(const QString& windowId,
-                          WebOSForeign::ExportedType exportedType)
+                          WebOSForeign::WebOSExportedType exportedType)
 
     : q_ptr(0)
     , m_windowId(windowId)
@@ -198,7 +197,7 @@ void WebOSImportedPrivate::attachSurface(QWaylandWindow* surface)
 }
 
 WebOSImported::WebOSImported(const QString& windowId,
-                             WebOSForeign::ExportedType exportedType)
+                             WebOSForeign::WebOSExportedType exportedType)
     : d_ptr(new WebOSImportedPrivate(windowId, exportedType))
 {
     Q_D(WebOSImported);
