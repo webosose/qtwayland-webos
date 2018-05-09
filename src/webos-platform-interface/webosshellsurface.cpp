@@ -56,6 +56,7 @@ static Qt::WindowState qtWindowStateFromWaylandState(uint32_t state)
 
 WebOSShellSurfacePrivate::WebOSShellSurfacePrivate(wl_webos_shell_surface* shellSurface, struct ::wl_shell_surface *shell_surface, QPlatformWindow* parent)
     : QWaylandWlShellSurface(shell_surface, static_cast<QWaylandWindow *>(parent))
+    , q_ptr(0)
     , m_shellSurface(shellSurface)
     , m_locationHint(WebOSShellSurface::LocationHintUnknown)
     , m_keyMask(WebOSShellSurface::KeyMaskDefault)

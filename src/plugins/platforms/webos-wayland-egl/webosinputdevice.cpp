@@ -160,10 +160,9 @@ void WebOSInputDevice::WebOSPointer::pointer_enter(uint32_t serial, struct wl_su
 void WebOSInputDevice::WebOSPointer::pointer_motion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y)
 {
     PMTRACE_FUNCTION;
-    QWaylandWindow *window = mFocus;
-    if (window == NULL)
+    if (!mFocus)
         return;
-    Pointer::pointer_motion(time, surface_x / window->devicePixelRatio() ,surface_y / window->devicePixelRatio());
+    Pointer::pointer_motion(time, surface_x / mFocus->devicePixelRatio(), surface_y / mFocus->devicePixelRatio());
 }
 
 WebOSInputDevice::WebOSTouch::WebOSTouch(QWaylandInputDevice *device)
@@ -176,6 +175,25 @@ void WebOSInputDevice::WebOSTouch::registerTouchDevice()
     PMTRACE_FUNCTION;
     WebOSInputDevice *device = static_cast<WebOSInputDevice *>(mParent);
     device->registerTouchDevice();
+}
+
+void WebOSInputDevice::WebOSTouch::touch_down(uint32_t serial, uint32_t time, struct wl_surface *surface, int32_t id, wl_fixed_t x, wl_fixed_t y)
+{
+    PMTRACE_FUNCTION;
+    if (!surface)
+        return;
+    QWaylandWindow *window = QWaylandWindow::fromWlSurface(surface);
+    if (!window)
+        return;
+    Touch::touch_down(serial, time, surface, id, x / window->devicePixelRatio(), y / window->devicePixelRatio());
+}
+
+void WebOSInputDevice::WebOSTouch::touch_motion(uint32_t time, int32_t id, wl_fixed_t x, wl_fixed_t y)
+{
+    PMTRACE_FUNCTION;
+    if (!mFocus)
+        return;
+    Touch::touch_motion(time, id, x / mFocus->devicePixelRatio(), y / mFocus->devicePixelRatio());
 }
 
 void WebOSInputDevice::WebOSTouch::touch_cancel()

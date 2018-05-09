@@ -59,8 +59,8 @@ class WebOSInputDevice::WebOSPointer : public QWaylandInputDevice::Pointer
 public:
     WebOSPointer(QWaylandInputDevice *device);
 
-    void pointer_enter(uint32_t serial, struct wl_surface *surface, wl_fixed_t sx, wl_fixed_t sy);
-    void pointer_motion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y);
+    void pointer_enter(uint32_t serial, struct wl_surface *surface, wl_fixed_t sx, wl_fixed_t sy) Q_DECL_OVERRIDE;
+    void pointer_motion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y) Q_DECL_OVERRIDE;
 };
 
 class WebOSInputDevice::WebOSTouch : public QWaylandInputDevice::Touch
@@ -69,6 +69,8 @@ public:
     WebOSTouch(QWaylandInputDevice *device);
 
     void registerTouchDevice();
+    void touch_down(uint32_t serial, uint32_t time, struct wl_surface *surface, int32_t id, wl_fixed_t x, wl_fixed_t y) Q_DECL_OVERRIDE;
+    void touch_motion(uint32_t time, int32_t id, wl_fixed_t x, wl_fixed_t y) Q_DECL_OVERRIDE;
     void touch_cancel() Q_DECL_OVERRIDE;
     void touch_frame() Q_DECL_OVERRIDE;
 };
