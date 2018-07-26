@@ -49,6 +49,11 @@ void WebOSCursor::changeCursor(QCursor *cursor, QWindow *window)
 
     struct wl_cursor *waylandCursor = requestCursor((WaylandCursor)newShape);
 
+    if (!waylandCursor) {
+        qWarning() << "Could not get cursor";
+        return;
+    }
+
     // webOS specific cursor handling with reserved hotspot values
     // 1) 255: ArrowCursor
     // 2) 254: BlankCursor
