@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018 LG Electronics, Inc.
+// Copyright (c) 2015-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,11 @@
 
 #include <QtWaylandClient/private/qwaylandintegration_p.h>
 
-class QWaylandScreen;
-class QWaylandCursor;
+using QtWaylandClient::QWaylandIntegration;
+using QtWaylandClient::QWaylandCursor;
+using QtWaylandClient::QWaylandScreen;
+using QtWaylandClient::QWaylandInputDevice;
+using QtWaylandClient::QWaylandDisplay;
 
 class WebOSIntegration : public QWaylandIntegration
 {
@@ -37,7 +40,7 @@ public:
     QPlatformWindow *createPlatformWindow(QWindow *window) const Q_DECL_OVERRIDE;
     QWaylandCursor *createPlatformCursor(QWaylandScreen *screen) const Q_DECL_OVERRIDE;
     QWaylandScreen *createPlatformScreen(QWaylandDisplay *display, int version, uint32_t id) const Q_DECL_OVERRIDE;
-    QWaylandInputDevice *createInputDevice(QWaylandDisplay *display, uint32_t version, uint32_t id) Q_DECL_OVERRIDE;
+    QWaylandInputDevice *createInputDevice(QWaylandDisplay *display, int version, uint32_t id) Q_DECL_OVERRIDE;
 #ifndef QT_NO_ACCESSIBILITY
     QPlatformAccessibility *createPlatformAccessibility() const Q_DECL_OVERRIDE;
 #endif

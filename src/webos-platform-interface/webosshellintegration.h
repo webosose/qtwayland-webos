@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018 LG Electronics, Inc.
+// Copyright (c) 2015-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,11 @@
 QT_BEGIN_NAMESPACE
 
 class WebOSShell;
+
+using QtWaylandClient::QWaylandWindow;
+using QtWaylandClient::QWaylandDisplay;
+using QtWaylandClient::QWaylandShellSurface;
+using QtWaylandClient::QWaylandShellIntegration;
 
 class WebOSShellIntegration : public QWaylandShellIntegration
 {

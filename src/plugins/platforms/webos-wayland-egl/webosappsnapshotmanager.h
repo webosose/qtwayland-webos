@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 LG Electronics, Inc.
+// Copyright (c) 2017-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,13 @@
 
 #include "appsnapshotmanager.h"
 
-class QWaylandDisplay;
-class QWaylandEglClientBufferIntegration;
+namespace QtWaylandClient {
+    class QWaylandDisplay;
+    class QWaylandEglClientBufferIntegration;
+}
+
+using QtWaylandClient::QWaylandDisplay;
+using QtWaylandClient::QWaylandEglClientBufferIntegration;
 class WebOSAppSnapshotManagerPrivate;
 
 class WebOSAppSnapshotManager : public AppSnapshotManager

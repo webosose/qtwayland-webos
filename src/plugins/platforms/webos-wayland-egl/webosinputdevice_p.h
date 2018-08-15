@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018 LG Electronics, Inc.
+// Copyright (c) 2015-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@
 #define WEBOSINPUTDEVICE_H
 
 #include <QtWaylandClient/private/qwaylandinputdevice_p.h>
+
+using QtWaylandClient::QWaylandInputDevice;
+using QtWaylandClient::QWaylandDisplay;
+using QtWaylandClient::QWaylandWindow;
 
 class WebOSInputDevice : public QWaylandInputDevice
 {

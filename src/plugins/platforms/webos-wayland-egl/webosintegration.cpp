@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018 LG Electronics, Inc.
+// Copyright (c) 2015-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@
 
 // configurable with WEBOS_DRAG_DISTANCE
 static int s_dragDistance = 10;
+
+using QtWaylandClient::QWaylandClipboard;
 
 WebOSIntegration::WebOSIntegration()
     : QWaylandIntegration(true)
@@ -102,7 +104,7 @@ QWaylandCursor *WebOSIntegration::createPlatformCursor(QWaylandScreen *screen) c
     return new WebOSCursor(screen);
 }
 
-QWaylandInputDevice *WebOSIntegration::createInputDevice(QWaylandDisplay *display, uint32_t version, uint32_t id)
+QWaylandInputDevice *WebOSIntegration::createInputDevice(QWaylandDisplay *display, int version, uint32_t id)
 {
     return new WebOSInputDevice(display, version, id);
 }

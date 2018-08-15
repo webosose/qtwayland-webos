@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018 LG Electronics, Inc.
+// Copyright (c) 2015-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -152,8 +152,9 @@ void WebOSInputDevice::WebOSPointer::pointer_enter(uint32_t serial, struct wl_su
 
     QWaylandWindow *grab = QWaylandWindow::mouseGrab();
     if (!grab) {
-        window->handleMouseEnter(parent);
-        window->handleMouse(parent, parent->getTime(), mSurfacePos, mGlobalPos, mButtons, parent->modifiers());
+        QtWaylandClient::QWaylandPointerEvent enter(QtWaylandClient::QWaylandPointerEvent::Enter, parent->getTime(),
+                mSurfacePos, mGlobalPos, mButtons, parent->modifiers());
+        window->handleMouse(parent, enter);
     }
 }
 

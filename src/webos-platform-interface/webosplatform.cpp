@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,6 +51,9 @@ WebOSPlatformPrivate::~WebOSPlatformPrivate()
 
 void WebOSPlatformPrivate::registry_global(void *data, struct wl_registry *registry, uint32_t id, const QString &interface, uint32_t version)
 {
+    Q_UNUSED(registry);
+    Q_UNUSED(version);
+
     WebOSPlatformPrivate *p = static_cast<WebOSPlatformPrivate *>(data);
     if (interface == "wl_webos_surface_group_compositor") {
         p->m_groupCompositor = new WebOSSurfaceGroupCompositor(p->display(), id);

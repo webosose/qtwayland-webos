@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,8 +25,14 @@
 #include <QtWaylandClient/private/qwaylandwlshellsurface_p.h>
 
 class QPlatformWindow;
-class QWaylandWindow;
 class WebOSShellSurface;
+
+namespace QtWaylandClient {
+    class QWaylandWindow;
+}
+
+using QtWaylandClient::QWaylandWindow;
+using QtWaylandClient::QWaylandWlShellSurface;
 
 class WebOSShellSurfacePrivate : public QWaylandWlShellSurface {
 
