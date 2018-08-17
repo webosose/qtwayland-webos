@@ -102,6 +102,7 @@ static int pre_dump(void* data)
             qWarning() << "failure to setsid() function : error=" << strerror(err);
             rv = false;
         }
+        close(fd);
     }
 
     return rv ? 0 : -1;
@@ -361,6 +362,7 @@ bool AppSnapshotManagerPrivate::restoreInternal()
     int argc = m_argc;
     char** argv = dup_commmand_line_argv(m_argc, m_argv);
     if (criue_get_argument(&argc, &argv) < 0) {
+        free_command_line_arguments(&argc, &argv);
         qWarning() << "fail in getting arguments";
         return false;
     }
