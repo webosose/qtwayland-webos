@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2019 LG Electronics, Inc.
+// Copyright (c) 2013-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include "webosinputmanager.h"
 #include "webosinputpanellocator.h"
 #include "webosforeign.h"
+#include "webostablet.h"
 
 #include <QDebug>
 #include <QtGui/private/qguiapplication_p.h>
@@ -63,6 +64,8 @@ void WebOSPlatformPrivate::registry_global(void *data, struct wl_registry *regis
         p->m_inputManager = new WebOSInputManager(p->display(), id);
     } else if (interface == "wl_webos_foreign") {
         p->m_foreign = new WebOSForeign(p->display(), id);
+    } else if (interface == "wl_webos_tablet") {
+        p->m_webosTablet = new WebOSTablet(p->display(), id);
     }
 }
 
@@ -125,6 +128,12 @@ WebOSForeign* WebOSPlatform::webOSForeign()
         return d->m_foreign;
     qWarning("No WebOSForeign available");
     return nullptr;
+}
+
+WebOSTablet* WebOSPlatform::webOSTablet()
+{
+    Q_D(WebOSPlatform);
+    return d->m_webosTablet;
 }
 
 #ifdef HAS_CRIU

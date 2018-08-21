@@ -23,6 +23,7 @@ class WebOSShell;
 class WebOSSurfaceGroupCompositor;
 class WebOSInputManager;
 class WebOSForeign;
+class WebOSTablet;
 #ifdef HAS_CRIU
 class AppSnapshotManager;
 #endif
@@ -48,6 +49,7 @@ public:
     WebOSSurfaceGroupCompositor* m_groupCompositor;
     WebOSInputManager* m_inputManager;
     WebOSForeign* m_foreign;
+    WebOSTablet* m_webosTablet = nullptr;
     QWaylandDisplay *m_display;
 #ifdef HAS_CRIU
     AppSnapshotManager* m_appSnapshotManager;

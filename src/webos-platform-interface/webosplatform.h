@@ -32,6 +32,7 @@ class WebOSSurfaceGroup;
 class WebOSInputManager;
 class WebOSInputPanelLocator;
 class WebOSForeign;
+class WebOSTablet;
 
 class WebOSPlatform : public QObject {
 
@@ -51,6 +52,8 @@ public:
     WebOSInputPanelLocator* inputPanelLocator();
 
     WebOSForeign* webOSForeign();
+
+    WebOSTablet* webOSTablet();
 
 #ifdef HAS_CRIU
     AppSnapshotManager* appSnapshotManager();
