@@ -31,6 +31,7 @@ public:
     ~WebOSInputManager();
     void setCursorVisible(bool visible);
     bool getCursorVisible() const {return m_mouseVisible;}
+    void requestChangeCursorVisibility(bool visibility);
 
 signals:
     void cursorVisibleChanged(bool visible);

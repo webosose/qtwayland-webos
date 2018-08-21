@@ -54,6 +54,12 @@ void WebOSInputManager::setCursorVisible(bool visible)
     }
 }
 
+void WebOSInputManager::requestChangeCursorVisibility(bool visibility)
+{
+    Q_D(WebOSInputManager);
+    d->set_cursor_visibility(visibility);
+}
+
 WebOSInputManager::~WebOSInputManager()
 {
 }
