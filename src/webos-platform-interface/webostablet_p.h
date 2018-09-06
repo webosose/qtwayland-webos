@@ -46,7 +46,7 @@ public:
     } state;
 
 protected:
-    virtual void webos_tablet_tablet_event(int32_t uniqueId, int32_t pointerType, int32_t down, wl_fixed_t globalX, wl_fixed_t globalY, uint32_t xTilt, uint32_t yTilt, wl_fixed_t pressure, wl_fixed_t rotation) override;
+    virtual void webos_tablet_tablet_event(wl_array *uniqueId, int32_t pointerType, int32_t down, wl_fixed_t globalX, wl_fixed_t globalY, int32_t xTilt, int32_t yTilt, wl_fixed_t pressure, wl_fixed_t rotation) override;
 
 };
 #endif

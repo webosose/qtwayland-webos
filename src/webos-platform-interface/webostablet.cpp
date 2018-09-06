@@ -19,6 +19,7 @@
 #include "webostablet.h"
 #include "webostablet_p.h"
 
+#include <QByteArray>
 #include <QGuiApplication>
 
 #include <qpa/qwindowsysteminterface.h>
@@ -34,22 +35,26 @@ WebOSTabletPrivate::WebOSTabletPrivate(QWaylandDisplay* display, uint32_t id)
 {
 }
 
-void WebOSTabletPrivate::webos_tablet_tablet_event(int32_t uniqueId, int32_t pointerType, int32_t down,
+void WebOSTabletPrivate::webos_tablet_tablet_event(wl_array *uniqueId, int32_t pointerType, int32_t down,
                                                wl_fixed_t globalX, wl_fixed_t globalY,
-                                               uint32_t xTilt, uint32_t yTilt,
+                                               int32_t xTilt, int32_t yTilt,
                                                wl_fixed_t pressure, wl_fixed_t rotation)
 {
-    if (!state.lastReportTool && pointerType)
-        QWindowSystemInterface::handleTabletEnterProximityEvent(QTabletEvent::Stylus, pointerType, uniqueId);
+    QByteArray uniqueIdArray(static_cast<char *>(uniqueId->data), uniqueId->size);
+    bool ok = false;
+    qint64 uid = 1;
+    uid = uniqueIdArray.toLongLong(&ok, 10);
 
+    if (!state.lastReportTool && pointerType)
+        QWindowSystemInterface::handleTabletEnterProximityEvent(QTabletEvent::Stylus, pointerType, uid);
     QPointF globalPos(wl_fixed_to_double(globalX), wl_fixed_to_double(globalY));
     QWindowSystemInterface::handleTabletEvent(0, down, QPointF(), globalPos,
                                               QTabletEvent::Stylus, pointerType,
                                               wl_fixed_to_double(pressure),
-                                              0, 0, 0, 0, 0, 1, qGuiApp->keyboardModifiers());
+                                              0, 0, 0, 0, 0, uid, qGuiApp->keyboardModifiers());
 
     if (state.lastReportTool && !pointerType)
-        QWindowSystemInterface::handleTabletLeaveProximityEvent(QTabletEvent::Stylus, pointerType, uniqueId);
+        QWindowSystemInterface::handleTabletLeaveProximityEvent(QTabletEvent::Stylus, pointerType, uid);
 
     state.lastReportDown = down;
     state.lastReportTool = pointerType;
