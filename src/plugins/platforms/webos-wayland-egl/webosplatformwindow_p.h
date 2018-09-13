@@ -42,7 +42,7 @@ private slots:
     void onOutputTransformChanged(const int& oldTransform, const int& newTransform);
 
 private:
-    bool m_hasOwnSize;
+    bool m_autoOrientation;
     QRect m_initialGeometry;
 };
 
