@@ -26,6 +26,7 @@ class WebOSShell;
 class WebOSSurfaceGroupCompositor;
 class WebOSSurfaceGroup;
 class WebOSInputManager;
+class WebOSInputPanelLocator;
 
 class WebOSPlatform : public QObject {
 
@@ -41,6 +42,8 @@ public:
     WebOSSurfaceGroupCompositor* surfaceGroupCompositor();
 
     WebOSInputManager* inputManager();
+
+    WebOSInputPanelLocator* inputPanelLocator();
 
 private:
     WebOSPlatform();

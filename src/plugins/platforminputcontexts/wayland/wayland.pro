@@ -33,3 +33,6 @@ SOURCES = \
 HEADERS = \
     keysymhelper.h \
     waylandinputcontext.h
+
+INCLUDEPATH += $${PWD}/../../../webos-platform-interface
+LIBS += -L$${OUT_PWD}/../../../webos-platform-interface -lwebos-platform-interface

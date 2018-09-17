@@ -19,6 +19,7 @@
 #include "webossurfacegroupcompositor.h"
 #include "webosshell.h"
 #include "webosinputmanager.h"
+#include "webosinputpanellocator.h"
 
 #include <QDebug>
 #include <QtGui/private/qguiapplication_p.h>
@@ -97,4 +98,9 @@ WebOSInputManager* WebOSPlatform::inputManager()
 {
     Q_D(WebOSPlatform);
     return d->m_inputManager;
+}
+
+WebOSInputPanelLocator* WebOSPlatform::inputPanelLocator()
+{
+    return WebOSInputPanelLocator::instance();
 }

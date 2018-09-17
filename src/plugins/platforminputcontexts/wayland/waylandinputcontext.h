@@ -93,6 +93,9 @@ public:
     void updateModifiersMap(struct wl_array *map);
     Qt::KeyboardModifiers convertNativeModifiersToQt(uint32_t modifiers);
 
+public Q_SLOTS:
+    void updateInputPanelRect(const QObject* targetObj, const QRect& rect);
+
 private Q_SLOTS:
     void focusObjectDestroyed(QObject *);
 
@@ -105,6 +108,8 @@ private:
     void updateSurroundingText(const QVariant& text, const QVariant& cursor, const QVariant& anchor);
     void resetPreEditData();
     void commitAndReset(bool keepCursorPosition = false);
+
+    void resetInputPanelRect(const QObject* targetObj);
 
     QObject* m_focusObject;
     wl_display* m_display;
@@ -121,6 +126,7 @@ private:
     PreEditData m_preEditData;
     XkbQtModifiersMap m_modifiersMap;
     QRectF m_keyboardRect;
+    QRect m_inputPanelRectRequested;
 
     InputPanelState m_inputPanelState;
 };

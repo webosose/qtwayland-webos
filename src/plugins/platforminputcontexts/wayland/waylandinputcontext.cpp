@@ -27,6 +27,8 @@
 #include <QDebug>
 #include <QRectF>
 
+#include "webosinputpanellocator.h"
+
 const struct wl_registry_listener WaylandInputContext::registryListener = {
     WaylandInputContext::registryGlobalAdded,
     WaylandInputContext::registryGlobalRemoved
@@ -133,6 +135,9 @@ WaylandInputContext::WaylandInputContext()
     , m_inputPanelState(InputPanelUnknownState)
 {
     ensureWaylandConnection();
+
+    connect(WebOSInputPanelLocator::instance(), &WebOSInputPanelLocator::inputPanelRectChanged,
+        this, &WaylandInputContext::updateInputPanelRect);
 }
 
 WaylandInputContext::~WaylandInputContext()
@@ -329,13 +334,44 @@ QRectF WaylandInputContext::keyboardRect() const
     return m_keyboardRect;
 }
 
-
 bool WaylandInputContext::isAnimating() const
 {
 #ifdef WAYLAND_INPUT_CONTEXT_DEBUG
     qDebug() << "false";
 #endif
     return false;
+}
+
+void WaylandInputContext::updateInputPanelRect(const QObject* targetObj,
+                                             const QRect& rect)
+{
+    if (!m_currentTextModel)
+        return;
+
+    // Check if targetObj is focused and rect differs from the previous one
+    if (targetObj == m_focusObject && m_inputPanelRectRequested != rect) {
+        text_model_set_input_panel_rect(m_currentTextModel,
+                                        rect.x(), rect.y(),
+                                        rect.width(), rect.height());
+        m_inputPanelRectRequested = rect;
+#ifdef WAYLAND_INPUT_CONTEXT_DEBUG
+        qDebug() << "inputPanelRect" << inputPanelRect;
+#endif
+    }
+}
+
+void WaylandInputContext::resetInputPanelRect(const QObject* targetObj)
+{
+    if (!m_currentTextModel)
+        return;
+
+    if (targetObj == m_focusObject) {
+        text_model_reset_input_panel_rect(m_currentTextModel);
+        m_inputPanelRectRequested.setRect(0, 0, 0, 0);
+#ifdef WAYLAND_INPUT_CONTEXT_DEBUG
+        qDebug() << "reset inputPanelRect";
+#endif
+    }
 }
 
 void WaylandInputContext::showInputPanel()
@@ -361,12 +397,16 @@ void WaylandInputContext::showInputPanel()
             m_currentTextModel = text_model_factory_create_text_model(m_textModelFactory);
             text_model_add_listener(m_currentTextModel, &textModelListener, this);
 
+            updateInputPanelRect(m_focusObject, WebOSInputPanelLocator::instance()->inputPanelRect(m_focusObject));
+
             text_model_activate(m_currentTextModel, serial++, m_seat, surface);
             m_isActivationPending = true;
         } else {
             qWarning() << "Text model activation has been requested already.";
         }
     } else {
+        updateInputPanelRect(m_focusObject, WebOSInputPanelLocator::instance()->inputPanelRect(m_focusObject));
+
         // This will execute pending queries also.
         update(Qt::ImHints | Qt::ImSurroundingText | Qt::ImAnchorPosition | Qt::ImCursorPosition | Qt::ImEnterKeyType | Qt::ImMaximumTextLength | Qt::ImPlatformData);
     }
@@ -432,6 +472,8 @@ void WaylandInputContext::setFocusObject(QObject *object)
         return;
 
     if (inputMethodAccepted() && qGuiApp->focusWindow()) {
+        // Reset inputPanelRect as the focused object changes
+        resetInputPanelRect(m_focusObject);
         showInputPanel();
     } else {
         hideInputPanel();
@@ -716,4 +758,5 @@ void WaylandInputContext::cleanup()
     m_isCleanupPending = false;
     m_isActivationPending = false;
     m_modelActivated = false;
+    m_inputPanelRectRequested.setRect(0, 0, 0, 0);
 }

@@ -34,7 +34,8 @@ SOURCES += \
     webossurfacegroup.cpp \
     webossurfacegrouplayer.cpp \
     webosxinput.cpp \
-    webosinputmanager.cpp
+    webosinputmanager.cpp \
+    webosinputpanellocator.cpp
 
 PUBLICHEADERS = \
     webosplatform.h \
@@ -45,7 +46,8 @@ PUBLICHEADERS = \
     webossurfacegrouplayer.h \
     webosinputmanager.h \
     webosxinput.h \
-    webosshellintegration.h
+    webosshellintegration.h \
+    webosinputpanellocator.h
 
 HEADERS += \
     $$PUBLICHEADERS \
@@ -55,7 +57,8 @@ HEADERS += \
     webossurfacegroupcompositor_p.h \
     webossurfacegroup_p.h \
     webossurfacegrouplayer_p.h \
-    webosinputmanager_p.h
+    webosinputmanager_p.h \
+    webosinputpanellocator_p.h
 
 headers.files += $$PUBLICHEADERS
 
