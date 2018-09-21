@@ -186,9 +186,9 @@ WebOSImportedPrivate::~WebOSImportedPrivate()
     q_ptr = NULL;
 }
 
-void WebOSImportedPrivate::requestPunchThrough()
+void WebOSImportedPrivate::requestPunchThrough(const QString& contextId)
 {
-    attach_punchthrough();
+    attach_punchthrough(contextId);
 }
 
 void WebOSImportedPrivate::attachSurface(QWaylandWindow* surface)
@@ -208,10 +208,10 @@ WebOSImported::~WebOSImported()
 {
 }
 
-void WebOSImported::requestPunchThrough()
+void WebOSImported::requestPunchThrough(const QString& contextId)
 {
     Q_D(WebOSImported);
-    d->requestPunchThrough();
+    d->requestPunchThrough(contextId);
 }
 
 void WebOSImported::attachSurface(QWindow* surface)

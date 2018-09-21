@@ -87,7 +87,7 @@ public:
                          WebOSForeign::WebOSExportedType exportedType);
     virtual ~WebOSImportedPrivate();
 
-    void requestPunchThrough();
+    void requestPunchThrough(const QString& contextId);
     void attachSurface(QWaylandWindow* surface);
 
     static inline WebOSImportedPrivate* get(WebOSImported* imported) {
