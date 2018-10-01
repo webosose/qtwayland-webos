@@ -51,7 +51,8 @@ void WebOSTabletPrivate::webos_tablet_tablet_event(wl_array *uniqueId, int32_t p
     QWindowSystemInterface::handleTabletEvent(0, down, QPointF(), globalPos,
                                               QTabletEvent::Stylus, pointerType,
                                               wl_fixed_to_double(pressure),
-                                              0, 0, 0, 0, 0, uid, qGuiApp->keyboardModifiers());
+                                              xTilt, yTilt, 0, 0, 0, uid,
+                                              qGuiApp->keyboardModifiers());
 
     if (state.lastReportTool && !pointerType)
         QWindowSystemInterface::handleTabletLeaveProximityEvent(QTabletEvent::Stylus, pointerType, uid);
