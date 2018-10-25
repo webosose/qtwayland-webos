@@ -22,6 +22,9 @@
 class WebOSShell;
 class WebOSSurfaceGroupCompositor;
 class WebOSInputManager;
+#ifdef HAS_CRIU
+class AppSnapshotManager;
+#endif
 
 class WebOSPlatformPrivate {
 
@@ -41,6 +44,9 @@ public:
     WebOSSurfaceGroupCompositor* m_groupCompositor;
     WebOSInputManager* m_inputManager;
     QWaylandDisplay *m_display;
+#ifdef HAS_CRIU
+    AppSnapshotManager* m_appSnapshotManager;
+#endif
 };
 
 #endif

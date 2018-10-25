@@ -20,6 +20,10 @@
 #include <QObject>
 #include <QScopedPointer>
 
+#ifdef HAS_CRIU
+#include "appsnapshotmanager.h"
+#endif
+
 class WebOSPlatformPrivate;
 class WebOSShell;
 
@@ -44,6 +48,13 @@ public:
     WebOSInputManager* inputManager();
 
     WebOSInputPanelLocator* inputPanelLocator();
+
+#ifdef HAS_CRIU
+    AppSnapshotManager* appSnapshotManager();
+
+private slots:
+    void onStateChanged(const AppSnapshotManager::AppSnapShotState state, const QString failureReason);
+#endif
 
 private:
     WebOSPlatform();

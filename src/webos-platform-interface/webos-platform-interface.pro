@@ -60,6 +60,14 @@ HEADERS += \
     webosinputmanager_p.h \
     webosinputpanellocator_p.h
 
+criu {
+    DEFINES += HAS_CRIU
+    PKGCONFIG += criu
+    SOURCES += appsnapshotmanager.cpp
+    PUBLICHEADERS += appsnapshotmanager.h
+    HEADERS += appsnapshotmanager_p.h
+}
+
 headers.files += $$PUBLICHEADERS
 
 headers.path += $$WEBOS_INSTALL_HEADERS

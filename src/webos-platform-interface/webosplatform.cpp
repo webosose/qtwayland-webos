@@ -24,12 +24,18 @@
 #include <QDebug>
 #include <QtGui/private/qguiapplication_p.h>
 #include <QtWaylandClient/private/qwaylandintegration_p.h>
+#ifdef HAS_CRIU
+#include <qpa/qplatformnativeinterface.h>
+#endif
 
 WebOSPlatformPrivate::WebOSPlatformPrivate()
     : m_shell(0)
     , m_groupCompositor(0)
     , m_inputManager(0)
     , m_display(0)
+#ifdef HAS_CRIU
+    , m_appSnapshotManager(0)
+#endif
 {
     //RISK : if uderlying QPA is not qtwayland, this will cause problem.
     //Currently no good way is found to validate QPA.
@@ -104,3 +110,40 @@ WebOSInputPanelLocator* WebOSPlatform::inputPanelLocator()
 {
     return WebOSInputPanelLocator::instance();
 }
+
+#ifdef HAS_CRIU
+AppSnapshotManager* WebOSPlatform::appSnapshotManager()
+{
+    Q_D(WebOSPlatform);
+    if (!d->m_appSnapshotManager) {
+        d->m_appSnapshotManager =
+            static_cast<AppSnapshotManager*>(QGuiApplication::platformNativeInterface()->nativeResourceForIntegration(QByteArrayLiteral("appsnapshotmanager")));
+
+        QObject::connect(d->m_appSnapshotManager, SIGNAL(stateChanged(const AppSnapshotManager::AppSnapShotState, const QString)),
+                         this, SLOT(onStateChanged(const AppSnapshotManager::AppSnapShotState, const QString)));
+    }
+    return d->m_appSnapshotManager;
+}
+
+void WebOSPlatform::onStateChanged(const AppSnapshotManager::AppSnapShotState state, const QString failureReason)
+{
+    Q_D(WebOSPlatform);
+
+    switch (state) {
+        case AppSnapshotManager::Ready:
+            delete d->m_groupCompositor;
+            delete d->m_inputManager;
+            break;
+        case AppSnapshotManager::PostDumped:
+        case AppSnapshotManager::Restored:
+            //RISK : if uderlying QPA is not qtwayland, this will cause problem.
+            //Currently no good way is found to validate QPA.
+            //QGuiApplication::platformName() was tried, but it returned Null QString.
+            if (d->m_display)
+                d->m_display->addRegistryListener(WebOSPlatformPrivate::registry_global, d);
+            break;
+        default:
+            break;
+    }
+}
+#endif

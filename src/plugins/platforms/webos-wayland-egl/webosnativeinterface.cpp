@@ -16,10 +16,20 @@
 
 #include <QScreen>
 #include <QtGui/QOpenGLContext>
+#include <QtGui/private/qguiapplication_p.h>
 #include <QtWaylandClient/private/qwaylandscreen_p.h>
+#include <QtWaylandClient/private/qwaylandintegration_p.h>
 
 #include "qwaylandglcontext.h"
+#include "qwaylandeglclientbufferintegration.h"
 #include "webosnativeinterface_p.h"
+#ifdef HAS_CRIU
+#include "webosappsnapshotmanager.h"
+#endif
+
+#ifdef HAS_CRIU
+static WebOSAppSnapshotManager *s_appSnapshotManager = NULL;
+#endif
 
 WebOSNativeInterface::WebOSNativeInterface(QWaylandIntegration *integration)
     : QWaylandNativeInterface(integration)
@@ -37,3 +47,22 @@ WebOSNativeInterface::nativeResourceForScreen(const QByteArray &resourceString, 
 
     return QWaylandNativeInterface::nativeResourceForScreen(resourceString, screen);
 }
+
+#ifdef HAS_CRIU
+void *
+WebOSNativeInterface::nativeResourceForIntegration(const QByteArray &resourceString)
+{
+    QByteArray lowerCaseResource = resourceString.toLower();
+
+    if (lowerCaseResource == "appsnapshotmanager") {
+        if (!s_appSnapshotManager) {
+            QWaylandIntegration* wi = static_cast<QWaylandIntegration*>(QGuiApplicationPrivate::platformIntegration());
+            s_appSnapshotManager = new WebOSAppSnapshotManager(wi->display(),
+                                                               static_cast<QWaylandEglClientBufferIntegration*>(wi->clientBufferIntegration()));
+        }
+        return s_appSnapshotManager;
+    }
+
+    return QWaylandNativeInterface::nativeResourceForIntegration(resourceString);
+}
+#endif

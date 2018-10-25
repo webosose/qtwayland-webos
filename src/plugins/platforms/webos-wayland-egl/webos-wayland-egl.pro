@@ -44,6 +44,12 @@ HEADERS += \
     webosscreen_p.h \
     qtwaylandwebostrace.h
 
+criu {
+    DEFINES += HAS_CRIU
+    SOURCES += webosappsnapshotmanager.cpp
+    HEADERS += webosappsnapshotmanager.h
+}
+
 lttng {
     DEFINES += HAS_LTTNG
     SOURCES +=  pmtrace_qtwaylandwebos_provider.c

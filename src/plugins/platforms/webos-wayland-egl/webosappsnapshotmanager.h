@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018 LG Electronics, Inc.
+// Copyright (c) 2017-2018 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,20 +14,28 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef WEBOSNATIVEINTERFACE_H
-#define WEBOSNATIVEINTERFACE_H
 
-#include <QtWaylandClient/private/qwaylandnativeinterface_p.h>
+#ifndef WEBOSAPPSNAPSHOTMANAGER_H
+#define WEBOSAPPSNAPSHOTMANAGER_H
 
-class WebOSNativeInterface : public QWaylandNativeInterface
+#include "appsnapshotmanager.h"
+
+class QWaylandDisplay;
+class QWaylandEglClientBufferIntegration;
+class WebOSAppSnapshotManagerPrivate;
+
+class WebOSAppSnapshotManager : public AppSnapshotManager
 {
+    Q_OBJECT
 public:
-    WebOSNativeInterface(QWaylandIntegration *integration);
+    WebOSAppSnapshotManager(QWaylandDisplay* dpy, QWaylandEglClientBufferIntegration* cbi);
 
-    void *nativeResourceForScreen(const QByteArray &resourceString, QScreen *screen);
-#ifdef HAS_CRIU
-    void *nativeResourceForIntegration(const QByteArray &resourceString);
-#endif
+private slots:
+    void onAboutToBlock();
+
+private:
+    Q_DECLARE_PRIVATE(WebOSAppSnapshotManager)
+    Q_DISABLE_COPY(WebOSAppSnapshotManager)
 };
 
 #endif
