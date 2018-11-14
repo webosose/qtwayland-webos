@@ -35,7 +35,7 @@ WebOSTabletPrivate::WebOSTabletPrivate(QWaylandDisplay* display, uint32_t id)
 {
 }
 
-void WebOSTabletPrivate::webos_tablet_tablet_event(wl_array *uniqueId, int32_t pointerType, int32_t down,
+void WebOSTabletPrivate::webos_tablet_tablet_event(wl_array *uniqueId, int32_t pointerType, int32_t buttons,
                                                wl_fixed_t globalX, wl_fixed_t globalY,
                                                int32_t xTilt, int32_t yTilt,
                                                wl_fixed_t pressure, wl_fixed_t rotation)
@@ -47,10 +47,11 @@ void WebOSTabletPrivate::webos_tablet_tablet_event(wl_array *uniqueId, int32_t p
 
     if (!state.lastReportTool && pointerType)
         QWindowSystemInterface::handleTabletEnterProximityEvent(QTabletEvent::Stylus, pointerType, uid);
+    bool down = buttons & Qt::LeftButton;
     QPointF globalPos(wl_fixed_to_double(globalX), wl_fixed_to_double(globalY));
-    QWindowSystemInterface::handleTabletEvent(0, down, QPointF(), globalPos,
+    QWindowSystemInterface::handleTabletEvent(QGuiApplication::focusWindow(), globalPos, globalPos,
                                               QTabletEvent::Stylus, pointerType,
-                                              wl_fixed_to_double(pressure),
+                                              (Qt::MouseButton)buttons, wl_fixed_to_double(pressure),
                                               xTilt, yTilt, 0, 0, 0, uid,
                                               qGuiApp->keyboardModifiers());
 
