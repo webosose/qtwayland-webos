@@ -65,7 +65,7 @@ criu {
     PKGCONFIG += criu
     SOURCES += appsnapshotmanager.cpp
     PUBLICHEADERS += appsnapshotmanager.h
-    HEADERS += appsnapshotmanager_p.h
+    HEADERS += $$PUBLICHEADERS appsnapshotmanager_p.h
 }
 
 headers.files += $$PUBLICHEADERS
