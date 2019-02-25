@@ -40,30 +40,39 @@ static bool platformWindowCreated(QWindow* w)
 }
 
 WebOSShellPrivate::WebOSShellPrivate(QWaylandDisplay* display, uint32_t id)
-    : m_display(display)
+    : m_wlShell(nullptr)
+    , m_display(display)
 {
     m_shell = static_cast<wl_webos_shell*>(wl_registry_bind(display->wl_registry(), id, &wl_webos_shell_interface, 1));
 }
 
 WebOSShellPrivate::~WebOSShellPrivate()
 {
+    if (m_wlShell) {
+        delete m_wlShell;
+        m_wlShell = nullptr;
+    }
 }
 
 QWaylandShellSurface* WebOSShellPrivate::createShellSurface(QPlatformWindow* window)
 {
     // Moved from qwaylandwlshellintegration.cpp
-    QtWayland::wl_shell *wlShell = nullptr;
+    if (m_wlShell) {
+        delete m_wlShell;
+        m_wlShell = nullptr;
+    }
+
     Q_FOREACH (QWaylandDisplay::RegistryGlobal global, m_display->globals()) {
         if (global.interface == QLatin1String("wl_shell")) {
-            wlShell = new QtWayland::wl_shell(m_display->wl_registry(), global.id, 1);
+            m_wlShell = new QtWayland::wl_shell(m_display->wl_registry(), global.id, 1);
             break;
         }
     }
 
-    if (wlShell) {
+    if (m_wlShell) {
         QWaylandWindow* waylandWindow = static_cast<QWaylandWindow*>(window);
         struct wl_webos_shell_surface* webos_shell_surface = wl_webos_shell_get_shell_surface(m_shell, waylandWindow->object());
-        struct wl_shell_surface *shell_surface = wlShell->get_shell_surface(waylandWindow->object());
+        struct wl_shell_surface *shell_surface = m_wlShell->get_shell_surface(waylandWindow->object());
         if (webos_shell_surface && shell_surface)
             return WebOSShellSurfacePrivate::get(new WebOSShellSurface(webos_shell_surface, shell_surface, window));
     }

@@ -19,6 +19,7 @@
 
 #include <QObject>
 #include <QWindow>
+#include <QtWaylandClient/private/qwayland-wayland.h>
 
 #include <wayland-client.h>
 #include <wayland-webos-shell-client-protocol.h>
@@ -48,6 +49,7 @@ public:
     QWaylandShellSurface* createShellSurface(QPlatformWindow* window);
 
     wl_webos_shell* m_shell;
+    QtWayland::wl_shell* m_wlShell;
     QWaylandDisplay* m_display;
 };
 
