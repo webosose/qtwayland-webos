@@ -37,6 +37,11 @@ void WebOSSurfaceGroupLayerPrivate::setZ(int z)
     set_z_index(z);
 }
 
+void WebOSSurfaceGroupLayerPrivate::setKeyIndex(int keyIndex)
+{
+    set_key_index(keyIndex);
+}
+
 void WebOSSurfaceGroupLayerPrivate::webos_surface_group_layer_surface_attached()
 {
     Q_Q(WebOSSurfaceGroupLayer);
@@ -63,4 +68,10 @@ void WebOSSurfaceGroupLayer::setZ(int z)
 {
     m_z = z;
     d_ptr->setZ(m_z);
+}
+
+
+void WebOSSurfaceGroupLayer::setKeyIndex(int keyIndex)
+{
+    d_ptr->setKeyIndex(keyIndex);
 }

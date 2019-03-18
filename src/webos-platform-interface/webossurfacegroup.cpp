@@ -95,6 +95,11 @@ void WebOSSurfaceGroupPrivate::focusLayer(const QString& layerName)
     }
 }
 
+void WebOSSurfaceGroupPrivate::commitKeyIndex(bool commit)
+{
+    commit_key_index(commit);
+}
+
 // Public class
 WebOSSurfaceGroup::WebOSSurfaceGroup()
     : d_ptr(new WebOSSurfaceGroupPrivate)
@@ -149,4 +154,10 @@ void WebOSSurfaceGroup::focusLayer(const QString& layerName)
 {
     Q_D(WebOSSurfaceGroup);
     d->focusLayer(layerName);
+}
+
+void WebOSSurfaceGroup::commitKeyIndex(bool commit)
+{
+    Q_D(WebOSSurfaceGroup);
+    d->commitKeyIndex(commit);
 }

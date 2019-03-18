@@ -36,6 +36,8 @@ public:
     void setZ(int z);
     int z() { return m_z; }
 
+    void setKeyIndex(int keyIndex);
+
 signals:
     void surfaceAttached();
     void surfaceDetached();

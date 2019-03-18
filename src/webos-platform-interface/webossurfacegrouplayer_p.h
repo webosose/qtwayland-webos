@@ -38,6 +38,7 @@ public:
     static inline WebOSSurfaceGroupLayerPrivate* get(WebOSSurfaceGroupLayer* layer) {
         return layer->d_func();
     }
+    void setKeyIndex(int keyIndex);
 
 protected:
     virtual void webos_surface_group_layer_surface_attached();

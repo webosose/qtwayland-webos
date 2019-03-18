@@ -51,6 +51,8 @@ public:
     void focusOwner();
     void focusLayer(const QString& layerName);
 
+    void commitKeyIndex(bool commit);
+
     void webos_surface_group_owner_destroyed();
 
     static inline WebOSSurfaceGroupPrivate* get(WebOSSurfaceGroup* group) {

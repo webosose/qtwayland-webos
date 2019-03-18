@@ -49,6 +49,8 @@ public:
     void focusOwner();
     void focusLayer(const QString& layerName);
 
+    void commitKeyIndex(bool commit);
+
 signals:
     void ownerDestroyed();
 
