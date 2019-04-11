@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -78,7 +78,11 @@ public:
 
     QPointF position();
 
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
     void setState(Qt::WindowState state);
+#else
+    void setState(Qt::WindowStates state);
+#endif
 
     QVariantMap properties() const;
     QVariant property(const QString &name) const;

@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018 LG Electronics, Inc.
+// Copyright (c) 2015-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,11 +53,15 @@ WebOSPlatformWindow::WebOSPlatformWindow(QWindow *window)
         QObject::connect(ss, &WebOSShellSurface::positionChanged, this, &WebOSPlatformWindow::onPositionChanged);
     }
 
-    WebOSScreen *screen = static_cast<WebOSScreen *>(mScreen);
+    WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
     QObject::connect(screen, &WebOSScreen::outputTransformChanged, this, &WebOSPlatformWindow::onOutputTransformChanged);
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
 bool WebOSPlatformWindow::setWindowStateInternal(Qt::WindowState state)
+#else
+bool WebOSPlatformWindow::setWindowStateInternal(Qt::WindowStates state)
+#endif
 {
     if (mState == state) {
         return false;
@@ -93,7 +97,11 @@ bool WebOSPlatformWindow::setWindowStateInternal(Qt::WindowState state)
     return true;
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
 void WebOSPlatformWindow::setWindowState(Qt::WindowState state)
+#else
+void WebOSPlatformWindow::setWindowState(Qt::WindowStates state)
+#endif
 {
     setWindowStateInternal(state);
 
@@ -117,7 +125,7 @@ void WebOSPlatformWindow::setGeometry(const QRect &rect)
 
     //handle transform for initial geometry
     if (initialize) {
-        WebOSScreen *screen = static_cast<WebOSScreen *>(mScreen);
+        WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
         onOutputTransformChanged(0, screen->currentTransform());
     }
 }
@@ -136,7 +144,7 @@ void WebOSPlatformWindow::onOutputTransformChanged(const int& oldTransform, cons
 {
     if (oldTransform % 2 != newTransform % 2) {
         if (m_autoOrientation) {
-            WebOSScreen *screen = static_cast<WebOSScreen *>(mScreen);
+            WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
             bool isOutputPortrait = screen->geometry().height() > screen->geometry().width();
             bool isWindowPortrait = geometry().height() > geometry().width();
 
@@ -183,5 +191,5 @@ void WebOSPlatformWindow::restoreMouseCursor(QWaylandInputDevice *device)
 
     //Do not use qt's setCursor here. Cause App's window cursor haven't chagned,
     //it will not affect current cursor shape, that is same shape.
-    mScreen->waylandCursor()->changeCursor(cp, window());
+    waylandScreen()->waylandCursor()->changeCursor(cp, window());
 }

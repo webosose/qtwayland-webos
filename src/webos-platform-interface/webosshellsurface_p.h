@@ -55,7 +55,11 @@ public:
     WebOSShellSurface::KeyMasks keyMask();
     void setKeyMask(WebOSShellSurface::KeyMasks keyMask);
 
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
     void setState(Qt::WindowState state);
+#else
+    void setState(Qt::WindowStates state);
+#endif
     QPointF position() { return m_position; }
     void positionChanged();
     void stateAboutToChange(Qt::WindowState state);
@@ -85,7 +89,11 @@ public:
     WebOSShellSurface::KeyMasks m_keyMask;
 
     WebOSShellSurface *q_ptr;
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
     Qt::WindowState m_state;
+#else
+    Qt::WindowStates m_state;
+#endif
 };
 
 #endif

@@ -29,11 +29,22 @@ class WebOSPlatformWindow : public QWaylandEglWindow
 {
 public:
     WebOSPlatformWindow(QWindow *window);
+
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
     void setWindowState(Qt::WindowState state) Q_DECL_OVERRIDE;
+#else
+    void setWindowState(Qt::WindowStates state) Q_DECL_OVERRIDE;
+#endif
+
     void setGeometry(const QRect &rect) Q_DECL_OVERRIDE;
 
 private:
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
     bool setWindowStateInternal(Qt::WindowState state);
+#else
+    bool setWindowStateInternal(Qt::WindowStates state);
+#endif
+
     void configure(uint32_t edges, int32_t width, int32_t height);
 
     void handleMouseLeave(QWaylandInputDevice *inputDevice) Q_DECL_OVERRIDE;

@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ const struct wl_webos_shell_surface_listener WebOSShellSurfacePrivate::listener 
     WebOSShellSurfacePrivate::state_about_to_change
 };
 
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
 static uint32_t waylandStateFromQtWindowState(Qt::WindowState state)
 {
     switch (state) {
@@ -42,6 +43,21 @@ static uint32_t waylandStateFromQtWindowState(Qt::WindowState state)
         default: return WL_WEBOS_SHELL_SURFACE_STATE_DEFAULT;
     }
 }
+#else
+static uint32_t waylandStateFromQtWindowState(Qt::WindowStates state)
+{
+    if (state.testFlag(Qt::WindowNoState))
+        return WL_WEBOS_SHELL_SURFACE_STATE_DEFAULT;
+    else if (state.testFlag(Qt::WindowMinimized))
+        return WL_WEBOS_SHELL_SURFACE_STATE_MINIMIZED;
+    else if (state.testFlag(Qt::WindowMaximized))
+        return WL_WEBOS_SHELL_SURFACE_STATE_MAXIMIZED;
+    else if (state.testFlag(Qt::WindowFullScreen))
+        return WL_WEBOS_SHELL_SURFACE_STATE_FULLSCREEN;
+    else
+        return WL_WEBOS_SHELL_SURFACE_STATE_DEFAULT;
+}
+#endif
 
 static Qt::WindowState qtWindowStateFromWaylandState(uint32_t state)
 {
@@ -81,7 +97,11 @@ void WebOSShellSurfacePrivate::state_changed(void *data, struct wl_webos_shell_s
 
     /* Update window state for QWindow/QWaylandWindow */
     shell->m_state = qtState;
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
     shell->m_parent->window()->setWindowState(shell->m_state);
+#else
+    shell->m_parent->window()->setWindowState(qtWindowStateFromWaylandState(waylandStateFromQtWindowState(shell->m_state)));
+#endif
 
     QWindowSystemInterface::handleWindowStateChanged(shell->m_parent->window(), shell->m_state);
     QWindowSystemInterface::flushWindowSystemEvents(); // Required for oldState to work on WindowStateChanged
@@ -147,7 +167,12 @@ void WebOSShellSurfacePrivate::stateAboutToChange(Qt::WindowState state)
     q->emitStateAboutToChange(state);
 }
 
+
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
 void WebOSShellSurfacePrivate::setState(Qt::WindowState state)
+#else
+void WebOSShellSurfacePrivate::setState(Qt::WindowStates state)
+#endif
 {
     if (m_state == state)
         return;
@@ -277,7 +302,12 @@ void WebOSShellSurface::emitStateAboutToChange(Qt::WindowState state)
     emit stateAboutToChange(state);
 }
 
+
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
 void WebOSShellSurface::setState(Qt::WindowState state)
+#else
+void WebOSShellSurface::setState(Qt::WindowStates state)
+#endif
 {
     Q_D(WebOSShellSurface);
     d->setState(state);
