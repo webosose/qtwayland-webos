@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2018 LG Electronics, Inc.
+# Copyright (c) 2015-2020 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,11 @@
 PLUGIN_TYPE = platforms
 load(qt_plugin)
 
-QT += waylandclient-private
+QT += waylandclient-private egl_support-private
+
+qtConfig(xkbcommon) {
+    QMAKE_USE_PRIVATE += xkbcommon
+}
 
 INCLUDEPATH += ../../../webos-platform-interface
 LIBS += -L../../../webos-platform-interface -lwebos-platform-interface

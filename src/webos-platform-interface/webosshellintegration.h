@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 LG Electronics, Inc.
+// Copyright (c) 2015-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,9 +39,6 @@ public:
     QWaylandDisplay *display() { return m_display; }
 
     static void registry_global(void *data, struct wl_registry *registry, uint32_t id, const QString &interface, uint32_t version);
-
-private:
-    QWaylandDisplay *m_display;
 };
 
 QT_END_NAMESPACE

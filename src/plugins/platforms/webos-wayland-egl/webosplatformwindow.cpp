@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 LG Electronics, Inc.
+// Copyright (c) 2015-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ webOSShellSurfaceFor(QWindow *window)
 WebOSPlatformWindow::WebOSPlatformWindow(QWindow *window)
     : QWaylandEglWindow(window)
     , m_autoOrientation(true)
+    , mState(Qt::WindowNoState)
 {
     setWindowStateInternal(window->windowState());
 
@@ -162,11 +163,6 @@ void WebOSPlatformWindow::onOutputTransformChanged(const int& oldTransform, cons
             qInfo() << "No platform window geometry change as WEBOS_WINDOW_NO_AUTO_ORIENTATION is set";
         }
     }
-}
-
-void WebOSPlatformWindow::configure(uint32_t edges, int32_t width, int32_t height)
-{
-    QWaylandWindow::configure(edges, width / devicePixelRatio(), height / devicePixelRatio());
 }
 
 void WebOSPlatformWindow::handleMouseLeave(QWaylandInputDevice *inputDevice)

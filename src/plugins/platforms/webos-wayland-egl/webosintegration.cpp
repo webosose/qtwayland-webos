@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 LG Electronics, Inc.
+// Copyright (c) 2015-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,11 +42,11 @@ WebOSIntegration::WebOSIntegration()
     if (qEnvironmentVariableIsSet("WEBOS_DRAG_DISTANCE"))
         s_dragDistance = qgetenv("WEBOS_DRAG_DISTANCE").toInt();
 
-    mNativeInterface = new WebOSNativeInterface(this);
-    mDisplay = new QWaylandDisplay(this);
-    mClipboard = new QWaylandClipboard(mDisplay);
+    mNativeInterface.reset(new WebOSNativeInterface(this));
+    mDisplay.reset(new QWaylandDisplay(this));
+    mClipboard.reset(new QWaylandClipboard(mDisplay.data()));
 #ifndef QT_NO_ACCESSIBILITY
-    mAccessibility = WebOSIntegration::createPlatformAccessibility();
+    mAccessibility.reset(WebOSIntegration::createPlatformAccessibility());
 #endif
 }
 

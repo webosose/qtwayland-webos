@@ -17,8 +17,8 @@
 TEMPLATE = lib
 
 QT += gui-private core-private waylandclient-private
-
 CONFIG += link_pkgconfig wayland-scanner
+LIBS += -L$$[QT_INSTALL_PREFIX]/lib -lQt5WaylandShellSurface
 PKGCONFIG += wayland-webos-client wayland-client
 
 WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-webos/webos-surface-group.xml

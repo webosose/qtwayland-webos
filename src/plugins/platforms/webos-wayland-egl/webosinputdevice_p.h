@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 LG Electronics, Inc.
+// Copyright (c) 2015-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,7 +53,9 @@ class WebOSInputDevice::WebOSKeyboard : public QWaylandInputDevice::Keyboard
 public:
     WebOSKeyboard(QWaylandInputDevice *device);
 
-    int keysymToQtKey(xkb_keysym_t keysym, Qt::KeyboardModifiers &modifiers, const QString &text) Q_DECL_OVERRIDE;
+#if QT_CONFIG(xkbcommon)
+    std::pair<int, QString> keysymToQtKey(xkb_keysym_t keysym, Qt::KeyboardModifiers &modifiers) override;
+#endif
 
     void keyboard_key(uint32_t serial, uint32_t time, uint32_t key, uint32_t state) Q_DECL_OVERRIDE;
 };

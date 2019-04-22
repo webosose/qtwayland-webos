@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018 LG Electronics, Inc.
+// Copyright (c) 2015-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,9 +47,9 @@ void WebOSCursor::changeCursor(QCursor *cursor, QWindow *window)
         return;
     }
 
-    struct wl_cursor *waylandCursor = requestCursor((WaylandCursor)newShape);
+    struct wl_cursor_image *image = mCursorTheme->cursorImage(newShape);
 
-    if (!waylandCursor) {
+    if (image == nullptr) {
         qWarning() << "Could not get cursor";
         return;
     }
@@ -58,16 +58,15 @@ void WebOSCursor::changeCursor(QCursor *cursor, QWindow *window)
     // 1) 255: ArrowCursor
     // 2) 254: BlankCursor
     if (newShape == Qt::ArrowCursor) {
-        waylandCursor->images[0]->hotspot_x = 255;
-        waylandCursor->images[0]->hotspot_y = 255;
+        image->hotspot_x = 255;
+        image->hotspot_y = 255;
     } else if (newShape == Qt::BlankCursor) {
-        waylandCursor->images[0]->hotspot_x = 254;
-        waylandCursor->images[0]->hotspot_y = 254;
+        image->hotspot_x = 254;
+        image->hotspot_y = 254;
     } else {
         // TODO
     }
 
-    struct wl_cursor_image *image = waylandCursor->images[0];
     struct wl_buffer *buffer = wl_cursor_image_get_buffer(image);
 
     if (!buffer) {
@@ -75,7 +74,7 @@ void WebOSCursor::changeCursor(QCursor *cursor, QWindow *window)
         return;
     }
 
-    mDisplay->setCursor(buffer, image);
+    mDisplay->setCursor(buffer, image, 1.0);
 }
 
 void WebOSCursor::createBitmapCursor(QPixmap cursorPixmap, QPoint hotSpot)
@@ -95,5 +94,5 @@ void WebOSCursor::createBitmapCursor(QPixmap cursorPixmap, QPoint hotSpot)
     struct wl_cursor_image customCursorImage = {cursorPixmap.width(), cursorPixmap.height(),
                                                 hotSpot.x(), hotSpot.y(), 0};
 
-    mDisplay->setCursor(mCustomCursorBuffer->buffer(), &customCursorImage);
+    mDisplay->setCursor(mCustomCursorBuffer->buffer(), &customCursorImage, 1.0);
 }

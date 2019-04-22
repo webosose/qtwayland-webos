@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 LG Electronics, Inc.
+// Copyright (c) 2015-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,8 +45,6 @@ private:
     bool setWindowStateInternal(Qt::WindowStates state);
 #endif
 
-    void configure(uint32_t edges, int32_t width, int32_t height);
-
     void handleMouseLeave(QWaylandInputDevice *inputDevice) Q_DECL_OVERRIDE;
     void restoreMouseCursor(QWaylandInputDevice *device) Q_DECL_OVERRIDE;
 
@@ -57,6 +55,12 @@ private slots:
 private:
     bool m_autoOrientation;
     QRect m_initialGeometry;
+
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
+    Qt::WindowState mState;
+#else
+    Qt::WindowStates mState;
+#endif
 };
 
 #endif

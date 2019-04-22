@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 LG Electronics, Inc.
+// Copyright (c) 2015-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,10 @@
 #include <QtWaylandClient/private/qwaylanddisplay_p.h>
 
 #include "qtwaylandwebostracer.h"
+
+#if QT_CONFIG(xkbcommon)
+#include <xkbcommon/xkbcommon.h>
+#endif
 
 WebOSInputDevice::WebOSInputDevice(QWaylandDisplay *display, int version, uint32_t id)
     : QWaylandInputDevice(display, version, id)
@@ -90,10 +94,15 @@ WebOSInputDevice::WebOSKeyboard::WebOSKeyboard(QWaylandInputDevice *device)
 
 }
 
-int WebOSInputDevice::WebOSKeyboard::keysymToQtKey(xkb_keysym_t keysym, Qt::KeyboardModifiers &modifiers, const QString &text)
+#if QT_CONFIG(xkbcommon)
+std::pair<int, QString> WebOSInputDevice::WebOSKeyboard::keysymToQtKey(xkb_keysym_t keysym, Qt::KeyboardModifiers &modifiers)
 {
     int code = 0;
     PMTRACE_FUNCTION;
+    QString text;
+    uint utf32 = xkb_keysym_to_utf32(keysym);
+    if (utf32)
+        text = QString::fromUcs4(&utf32, 1);
 
     if (keysym >= XKB_KEY_F1 && keysym <= XKB_KEY_F35) {
         code =  Qt::Key_F1 + (int(keysym) - XKB_KEY_F1);
@@ -114,9 +123,9 @@ int WebOSInputDevice::WebOSKeyboard::keysymToQtKey(xkb_keysym_t keysym, Qt::Keyb
         // any other keys
         code = Keyboard::keysymToQtKey(keysym);
     }
-
-    return code ? code : keysym;
+    return { (code ? code : keysym), text };
 }
+#endif
 
 void WebOSInputDevice::WebOSKeyboard::keyboard_key(uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
 {
