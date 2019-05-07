@@ -41,7 +41,8 @@ public:
 
     enum WebOSExportedType {
         VideoObject = 0, // Exported object is Video
-        SubtitleObject = 1 // Exported object is Subtitle
+        SubtitleObject = 1, // Exported object is Subtitle
+        TransparentObject = 2 // Exported object is Transparent
     };
 
     ~WebOSForeign();
