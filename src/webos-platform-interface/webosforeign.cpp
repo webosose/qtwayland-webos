@@ -125,6 +125,41 @@ void WebOSExportedPrivate::setExportedWindow(const QRegion &sourceRegion, const 
     wl_region_destroy(wl_destination_region);
 }
 
+void WebOSExportedPrivate::setCropRegion(const QRegion &originalInputRegion, const QRegion &sourceRegion, const QRegion &destinationRegion)
+{
+    if (!isInitialized())
+        return;
+
+    m_originalRegion = originalInputRegion;
+    m_sourceRegion = sourceRegion;
+    m_destinationRegion = destinationRegion;
+
+    QPlatformNativeInterface *wliface = QGuiApplication::platformNativeInterface();
+    wl_compositor *wlcompositor = static_cast<wl_compositor *>(wliface->nativeResourceForIntegration("compositor"));
+    qreal dpr = m_window->devicePixelRatio();
+
+    wl_region* wl_original_region = wl_compositor_create_region(wlcompositor);
+    Q_FOREACH (const QRect &originalRect, m_originalRegion.rects()) {
+        wl_region_add(wl_original_region, originalRect.x()*dpr, originalRect.y()*dpr, originalRect.width()*dpr, originalRect.height()*dpr);
+    }
+
+    wl_region* wl_source_region = wl_compositor_create_region(wlcompositor);
+    Q_FOREACH (const QRect &sourceRect, m_sourceRegion.rects()) {
+        wl_region_add(wl_source_region, sourceRect.x()*dpr, sourceRect.y()*dpr, sourceRect.width()*dpr, sourceRect.height()*dpr);
+    }
+
+    wl_region* wl_destination_region = wl_compositor_create_region(wlcompositor);
+    Q_FOREACH (const QRect &destinationRect, m_destinationRegion.rects()) {
+        wl_region_add(wl_destination_region, destinationRect.x()*dpr, destinationRect.y()*dpr, destinationRect.width()*dpr, destinationRect.height()*dpr);
+    }
+
+    set_crop_region(wl_original_region, wl_source_region, wl_destination_region);
+
+    wl_region_destroy(wl_original_region);
+    wl_region_destroy(wl_source_region);
+    wl_region_destroy(wl_destination_region);
+}
+
 QString WebOSExportedPrivate::getWindowId()
 {
     return m_windowId;
@@ -159,6 +194,12 @@ void WebOSExported::setExportedWindow(const QRegion &sourceRegion, const QRegion
 {
     Q_D(WebOSExported);
     return d->setExportedWindow(sourceRegion, destinationRegion);
+}
+
+void WebOSExported::setCropRegion(const QRegion &originalRegion, const QRegion &sourceRegion, const QRegion &destinationRegion)
+{
+    Q_D(WebOSExported);
+    return d->setCropRegion(originalRegion, sourceRegion, destinationRegion);
 }
 
 QString WebOSExported::getWindowId()

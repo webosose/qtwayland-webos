@@ -55,6 +55,7 @@ public:
     virtual ~WebOSExportedPrivate();
 
     void setExportedWindow(const QRegion &sourceRegion, const QRegion &destinationRegion);
+    void setCropRegion(const QRegion &originalInputRegion, const QRegion &sourceRegion, const QRegion &destinationRegion);
 
     QString getWindowId();
     WebOSForeign::WebOSExportedType getWebOSExportedType();
@@ -71,6 +72,7 @@ protected:
 
 private:
     QWindow* m_window = NULL;
+    QRegion m_originalRegion;
     QRegion m_sourceRegion;
     QRegion m_destinationRegion;
     QString m_windowId;
