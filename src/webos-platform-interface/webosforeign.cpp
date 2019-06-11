@@ -160,6 +160,14 @@ void WebOSExportedPrivate::setCropRegion(const QRegion &originalInputRegion, con
     wl_region_destroy(wl_destination_region);
 }
 
+void WebOSExportedPrivate::setProperty(const QString &name, const QString &value)
+{
+    if (!isInitialized())
+        return;
+
+    set_property(name.toLatin1().constData(), value.toLatin1().constData());
+}
+
 QString WebOSExportedPrivate::getWindowId()
 {
     return m_windowId;
@@ -200,6 +208,12 @@ void WebOSExported::setCropRegion(const QRegion &originalRegion, const QRegion &
 {
     Q_D(WebOSExported);
     return d->setCropRegion(originalRegion, sourceRegion, destinationRegion);
+}
+
+void WebOSExported::setProperty(const QString & name, const QString & value)
+{
+    Q_D(WebOSExported);
+    return d->setProperty(name, value);
 }
 
 QString WebOSExported::getWindowId()
