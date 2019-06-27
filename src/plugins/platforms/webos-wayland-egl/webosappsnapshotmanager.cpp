@@ -54,10 +54,8 @@ public:
 
 template <typename T> static void destroyAndLeaveDangling(const T* ptr)
 {
-    T* tmp = static_cast<T*>(malloc(sizeof(T)));
-    memcpy(tmp, ptr, sizeof(T));
-
-    free(tmp);
+    if (ptr)
+        ptr->~T();
 }
 
 WebOSAppSnapshotManagerPrivate::WebOSAppSnapshotManagerPrivate(QWaylandDisplay* dpy, QWaylandEglClientBufferIntegration* cbi)
