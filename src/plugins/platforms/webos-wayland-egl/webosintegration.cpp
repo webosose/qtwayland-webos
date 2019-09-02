@@ -52,6 +52,7 @@ WebOSIntegration::WebOSIntegration()
 
 WebOSIntegration::~WebOSIntegration()
 {
+    mInputContext.reset(nullptr);
 }
 
 void WebOSIntegration::initialize()
