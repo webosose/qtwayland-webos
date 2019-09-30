@@ -21,8 +21,10 @@
 
 namespace QtWaylandClient {
     class QWaylandDisplay;
+    class QWaylandWindow;
 }
 using QtWaylandClient::QWaylandDisplay;
+using QtWaylandClient::QWaylandWindow;
 
 class QWindow;
 class QRegion;
@@ -84,6 +86,7 @@ class WebOSImported : public QObject {
 public:
     ~WebOSImported();
     void requestPunchThrough();
+    void attachSurface(QWindow* surface);
 
 private:
     WebOSImported(const QString& windowId,

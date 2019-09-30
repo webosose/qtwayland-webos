@@ -88,6 +88,7 @@ public:
     virtual ~WebOSImportedPrivate();
 
     void requestPunchThrough();
+    void attachSurface(QWaylandWindow* surface);
 
     static inline WebOSImportedPrivate* get(WebOSImported* imported) {
         return imported->d_func();

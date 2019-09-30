@@ -25,7 +25,6 @@
 #include "webosforeign.h"
 #include "webosforeign_p.h"
 
-using QtWaylandClient::QWaylandWindow;
 
 WebOSForeignPrivate::WebOSForeignPrivate(QWaylandDisplay* display,
                                          uint32_t id)
@@ -193,6 +192,11 @@ void WebOSImportedPrivate::requestPunchThrough()
     attach_punchthrough();
 }
 
+void WebOSImportedPrivate::attachSurface(QWaylandWindow* surface)
+{
+    attach_surface(surface->object());
+}
+
 WebOSImported::WebOSImported(const QString& windowId,
                              WebOSForeign::ExportedType exportedType)
     : d_ptr(new WebOSImportedPrivate(windowId, exportedType))
@@ -209,4 +213,10 @@ void WebOSImported::requestPunchThrough()
 {
     Q_D(WebOSImported);
     d->requestPunchThrough();
+}
+
+void WebOSImported::attachSurface(QWindow* surface)
+{
+    Q_D(WebOSImported);
+    d->attachSurface(static_cast<QWaylandWindow*>(surface->handle()));
 }
