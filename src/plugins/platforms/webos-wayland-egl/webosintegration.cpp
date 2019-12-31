@@ -46,7 +46,7 @@ WebOSIntegration::WebOSIntegration()
     mDisplay = new QWaylandDisplay(this);
     mClipboard = new QWaylandClipboard(mDisplay);
 #ifndef QT_NO_ACCESSIBILITY
-    mAccessibility = createPlatformAccessibility();
+    mAccessibility = WebOSIntegration::createPlatformAccessibility();
 #endif
 }
 
