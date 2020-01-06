@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2019 LG Electronics, Inc.
+// Copyright (c) 2013-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ public:
 
     WebOSShellPrivate(QWaylandDisplay* display, uint32_t id);
     virtual ~WebOSShellPrivate();
+    WebOSShellPrivate(const WebOSShellPrivate&) = delete;
+    WebOSShellPrivate &operator=(const WebOSShellPrivate&) = delete;
 
     static inline WebOSShellPrivate* get(WebOSShell* shell) {
         return shell->d_func();
