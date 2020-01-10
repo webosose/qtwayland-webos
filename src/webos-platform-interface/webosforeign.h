@@ -90,7 +90,7 @@ class WebOSImported : public QObject {
     Q_OBJECT
 public:
     ~WebOSImported();
-    void requestPunchThrough(const QString& contextId);
+    void requestPunchThrough(const QString& contextId = QString("MAIN"));
     void attachSurface(QWindow* surface);
 
 private:

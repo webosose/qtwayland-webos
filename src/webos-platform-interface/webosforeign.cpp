@@ -243,7 +243,7 @@ WebOSImportedPrivate::~WebOSImportedPrivate()
 
 void WebOSImportedPrivate::requestPunchThrough(const QString& contextId)
 {
-    attach_punchthrough(contextId);
+    attach_punchthrough_with_context(contextId);
 }
 
 void WebOSImportedPrivate::attachSurface(QWaylandWindow* surface)
