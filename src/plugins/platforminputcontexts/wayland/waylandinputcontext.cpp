@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -403,6 +403,7 @@ void WaylandInputContext::showInputPanel()
             m_isActivationPending = true;
         } else {
             qWarning() << "Text model activation has been requested already.";
+            updateInputPanelRect(m_focusObject, WebOSInputPanelLocator::instance()->inputPanelRect(m_focusObject));
         }
     } else {
         updateInputPanelRect(m_focusObject, WebOSInputPanelLocator::instance()->inputPanelRect(m_focusObject));
