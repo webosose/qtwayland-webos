@@ -44,6 +44,15 @@ WebOSEglClientBufferIntegration::createBufferFor(wl_resource *buffer)
     return WaylandEglClientBufferIntegration::createBufferFor(buffer);
 }
 
+bool WebOSEglClientBufferIntegration::isSecured(struct ::wl_resource *buffer)
+{
+    if (m_externalBufferIntegration) {
+        return m_externalBufferIntegration->isSecured(buffer);
+    }
+
+    return false;
+}
+
 void WebOSEglClientBufferIntegration::loadExternalBufferIntegration()
 {
     QStringList keys = QtWayland::ClientBufferIntegrationFactory::keys();

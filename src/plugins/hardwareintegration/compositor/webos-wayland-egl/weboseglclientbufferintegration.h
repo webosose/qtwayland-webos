@@ -25,6 +25,7 @@ public:
 
     void initializeHardware(struct ::wl_display *display) override;
     QtWayland::ClientBuffer *createBufferFor(wl_resource *buffer) override;
+    bool isSecured(struct ::wl_resource *buffer) override;
 
 private:
     void loadExternalBufferIntegration();
