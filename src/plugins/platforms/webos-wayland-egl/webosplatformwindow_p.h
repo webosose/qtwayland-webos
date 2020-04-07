@@ -51,6 +51,7 @@ private:
 private slots:
     void onPositionChanged();
     void onOutputTransformChanged(const int& oldTransform, const int& newTransform);
+    void onDevicePixelRatioChanged();
 
 private:
     bool m_autoOrientation;

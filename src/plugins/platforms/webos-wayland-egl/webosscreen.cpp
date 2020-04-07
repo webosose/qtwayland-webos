@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018 LG Electronics, Inc.
+// Copyright (c) 2015-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -81,12 +81,15 @@ void WebOSScreen::updateDevicePixelRatio()
         qInfo() << "Set auto devicePixelRatio as" << ratio << "screen:" << screenWidth << screenHeight << "window base geometry:" << w << h;
     }
 
-    if (ratio > 0.0) {
+    if (ratio <= 0.0) {
+        ratio = 1.0;
+        qInfo() << "Use default devicePixelRatio" << ratio;
+    }
+
+    if (mDevicePixelRatio != ratio) {
         mDevicePixelRatio = ratio;
-    } else {
-        // Fallback
-        mDevicePixelRatio = 1.0;
-        qInfo() << "Use default devicePixelRatio" << mDevicePixelRatio;
+        qInfo() << "Set devicePixelRatio to" << mDevicePixelRatio;
+        emit devicePixelRatioChanged();
     }
 }
 
