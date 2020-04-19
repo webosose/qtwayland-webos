@@ -101,7 +101,8 @@ void WebOSScreen::output_done()
     if (mTransform >= 0 && mCurrentTransform != mTransform) {
         int oldTransform = mCurrentTransform;
         mCurrentTransform = mTransform;
-        emit outputTransformChanged(oldTransform, mCurrentTransform);
+        if (compareOutputTransform(oldTransform, mCurrentTransform))
+            emit outputTransformChanged();
     }
     QWaylandScreen::output_done();
     updateDevicePixelRatio();

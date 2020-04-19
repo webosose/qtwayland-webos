@@ -50,7 +50,7 @@ private:
 
 private slots:
     void onPositionChanged();
-    void onOutputTransformChanged(const int& oldTransform, const int& newTransform);
+    void onOutputTransformChanged();
     void onDevicePixelRatioChanged();
 
 private:

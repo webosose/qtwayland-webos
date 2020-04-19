@@ -33,9 +33,10 @@ public:
     void output_done() Q_DECL_OVERRIDE;
 
     int currentTransform() const { return mCurrentTransform; }
+    static bool compareOutputTransform(const int& a, const int& b) { return (a % 2 != b % 2); }
 
 signals:
-    void outputTransformChanged(const int& oldTransform, const int& newTransform);
+    void outputTransformChanged();
     void devicePixelRatioChanged();
 
 private:

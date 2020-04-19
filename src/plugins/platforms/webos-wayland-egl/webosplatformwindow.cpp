@@ -125,10 +125,11 @@ void WebOSPlatformWindow::setGeometry(const QRect &rect)
     if (ss)
         ss->setInputRegion(QRect(0, 0, geometry().width(), geometry().height()));
 
-    //handle transform for initial geometry
+    // Handle transform for initial geometry
     if (initialize) {
         WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
-        onOutputTransformChanged(0, screen->currentTransform());
+        if (WebOSScreen::compareOutputTransform(0, screen->currentTransform()))
+            onOutputTransformChanged();
     }
 }
 
@@ -142,27 +143,25 @@ void WebOSPlatformWindow::onPositionChanged()
                 geometry().width(), geometry().height()));
 }
 
-void WebOSPlatformWindow::onOutputTransformChanged(const int& oldTransform, const int& newTransform)
+void WebOSPlatformWindow::onOutputTransformChanged()
 {
-    if (oldTransform % 2 != newTransform % 2) {
-        if (m_autoOrientation) {
-            WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
-            bool isOutputPortrait = screen->geometry().height() > screen->geometry().width();
-            bool isWindowPortrait = geometry().height() > geometry().width();
+    if (m_autoOrientation) {
+        WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
+        bool isOutputPortrait = screen->geometry().height() > screen->geometry().width();
+        bool isWindowPortrait = geometry().height() > geometry().width();
 
-            if (isOutputPortrait != isWindowPortrait) {
-                // Swap width and height to make window and output orientation in sync
-                QRect newGeometry(geometry());
-                newGeometry.setWidth(geometry().height());
-                newGeometry.setHeight(geometry().width());
-                qInfo() << "Update platform window geometry as per screen geometry change:" << geometry() << "->" << newGeometry;
-                setGeometry(newGeometry);
-            } else {
-                qInfo() << "Keep the platform window geometry:" << geometry() << "screen:" << screen->geometry();
-            }
+        if (isOutputPortrait != isWindowPortrait) {
+            // Swap width and height to make window and output orientation in sync
+            QRect newGeometry(geometry());
+            newGeometry.setWidth(geometry().height());
+            newGeometry.setHeight(geometry().width());
+            qInfo() << "Update platform window geometry as per screen geometry change:" << geometry() << "->" << newGeometry;
+            setGeometry(newGeometry);
         } else {
-            qInfo() << "No platform window geometry change as WEBOS_WINDOW_NO_AUTO_ORIENTATION is set";
+            qInfo() << "Keep the platform window geometry:" << geometry() << "screen:" << screen->geometry();
         }
+    } else {
+        qInfo() << "No platform window geometry change as WEBOS_WINDOW_NO_AUTO_ORIENTATION is set";
     }
 }
 
