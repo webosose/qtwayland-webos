@@ -17,6 +17,7 @@
 #include <QByteArray>
 #include <QString>
 #include <QRegExp>
+#include <QUrlQuery>
 #include <QDebug>
 
 #include <qpa/qwindowsysteminterface.h>
@@ -28,7 +29,6 @@ WebOSScreen::WebOSScreen(QWaylandDisplay *display, int version, uint32_t id)
     , mDevicePixelRatio(1.0)
     , mCurrentTransform(-1)
 {
-
 }
 
 qreal WebOSScreen::devicePixelRatio() const
@@ -95,6 +95,9 @@ void WebOSScreen::updateDevicePixelRatio()
 
 void WebOSScreen::output_done()
 {
+    // Get output name from the model string
+    mOutputName = QUrlQuery(mModel).queryItemValue(QStringLiteral("name"));
+
     if (mTransform >= 0 && mCurrentTransform != mTransform) {
         int oldTransform = mCurrentTransform;
         mCurrentTransform = mTransform;
