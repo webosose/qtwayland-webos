@@ -52,6 +52,7 @@ private slots:
     void onPositionChanged();
     void onOutputTransformChanged();
     void onDevicePixelRatioChanged();
+    void onScreenChanged(QScreen *screen);
 
 private:
     bool m_autoOrientation;
