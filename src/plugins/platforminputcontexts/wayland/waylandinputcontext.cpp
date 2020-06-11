@@ -680,12 +680,20 @@ void WaylandInputContext::textModelKeySym(void *data, struct text_model *text_mo
 #ifdef WAYLAND_INPUT_CONTEXT_DEBUG
     qDebug() << __PRETTY_FUNCTION__ << "qt key" << qtKey << "modifier" << qtModifiers;
 #endif
-    /*
-     * Temporary way to map the keys until xkbcommon is in use [GF-4360]
-     */
+
     QString str;
-    if (qtKey == Qt::Key_Enter || qtKey == Qt::Key_Return) {
+
+    switch (qtKey) {
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+        // Temporary way to map the keys until xkbcommon is in use [GF-4360]
         str = QString("\r");
+        break;
+    case Qt::Key_Left:
+    case Qt::Key_Right:
+        // Make sure the preedit string committed before moving the cursor
+        that->commitAndReset(qtKey == Qt::Key_Right);
+        break;
     }
 
     QWindowSystemInterface::handleExtendedKeyEvent(qGuiApp->focusWindow(),
