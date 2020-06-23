@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2019 LG Electronics, Inc.
+// Copyright (c) 2013-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ const struct wl_webos_shell_surface_listener WebOSShellSurfacePrivate::listener 
     WebOSShellSurfacePrivate::position_changed,
     WebOSShellSurfacePrivate::close,
     WebOSShellSurfacePrivate::exposed,
-    WebOSShellSurfacePrivate::state_about_to_change
+    WebOSShellSurfacePrivate::state_about_to_change,
+    WebOSShellSurfacePrivate::addon_status_changed
 };
 
 #if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
@@ -67,6 +68,17 @@ static Qt::WindowState qtWindowStateFromWaylandState(uint32_t state)
         case WL_WEBOS_SHELL_SURFACE_STATE_MAXIMIZED: return Qt::WindowMaximized;
         case WL_WEBOS_SHELL_SURFACE_STATE_FULLSCREEN: return Qt::WindowFullScreen;
         default: return Qt::WindowNoState;
+    }
+}
+
+static WebOSShellSurface::AddonStatus addonStatusFromWaylandState(uint32_t state)
+{
+    switch (state) {
+    case WL_WEBOS_SHELL_SURFACE_ADDON_STATUS_NULL:   return WebOSShellSurface::AddonStatusNull;
+    case WL_WEBOS_SHELL_SURFACE_ADDON_STATUS_LOADED: return WebOSShellSurface::AddonStatusLoaded;
+    case WL_WEBOS_SHELL_SURFACE_ADDON_STATUS_DENIED: return WebOSShellSurface::AddonStatusDenied;
+    case WL_WEBOS_SHELL_SURFACE_ADDON_STATUS_ERROR:  return WebOSShellSurface::AddonStatusError;
+    default: return WebOSShellSurface::AddonStatusNull;
     }
 }
 
@@ -167,6 +179,19 @@ void WebOSShellSurfacePrivate::stateAboutToChange(Qt::WindowState state)
     q->emitStateAboutToChange(state);
 }
 
+void WebOSShellSurfacePrivate::addon_status_changed(void *data, struct wl_webos_shell_surface *wl_webos_shell_surface, uint32_t addon_status)
+{
+    Q_UNUSED(wl_webos_shell_surface);
+    WebOSShellSurfacePrivate* shell = static_cast<WebOSShellSurfacePrivate*>(data);
+    WebOSShellSurface::AddonStatus status = addonStatusFromWaylandState(addon_status);
+    shell->addonStatusChanged(status);
+}
+
+void WebOSShellSurfacePrivate::addonStatusChanged(WebOSShellSurface::AddonStatus status)
+{
+    Q_Q(WebOSShellSurface);
+    q->emitAddonStatusChanged(status);
+}
 
 #if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
 void WebOSShellSurfacePrivate::setState(Qt::WindowState state)
@@ -275,6 +300,31 @@ void WebOSShellSurfacePrivate::setInputRegion(const QRegion& region)
     wl_region_destroy(wlregion);
 }
 
+void WebOSShellSurfacePrivate::setAddon(const QString& addon)
+{
+    Q_Q(WebOSShellSurface);
+    if (addon != m_addon) {
+        m_addon = addon;
+        wl_webos_shell_surface_set_addon(m_shellSurface, m_addon.toUtf8().constData());
+        q->emitAddonChanged();
+    }
+}
+
+void WebOSShellSurfacePrivate::resetAddon()
+{
+    Q_Q(WebOSShellSurface);
+    if (!m_addon.isEmpty()) {
+        wl_webos_shell_surface_reset_addon(m_shellSurface);
+        m_addon.clear();
+        q->emitAddonChanged();
+    }
+}
+
+QString WebOSShellSurfacePrivate::addon() const
+{
+    return m_addon;
+}
+
 WebOSShellSurface::WebOSShellSurface(wl_webos_shell_surface* shellSurface, struct ::wl_shell_surface *shell_surface, QPlatformWindow* parent)
     : d_ptr(new WebOSShellSurfacePrivate(shellSurface, shell_surface, parent))
 {
@@ -375,4 +425,32 @@ void WebOSShellSurface::setInputRegion(const QRegion& region)
 {
     Q_D(WebOSShellSurface);
     d->setInputRegion(region);
+}
+
+QString WebOSShellSurface::addon()
+{
+    Q_D(WebOSShellSurface);
+    return d->addon();
+}
+
+void WebOSShellSurface::setAddon(const QString& addon)
+{
+    Q_D(WebOSShellSurface);
+    d->setAddon(addon);
+}
+
+void WebOSShellSurface::resetAddon()
+{
+    Q_D(WebOSShellSurface);
+    d->resetAddon();
+}
+
+void WebOSShellSurface::emitAddonChanged()
+{
+    emit addonChanged();
+}
+
+void WebOSShellSurface::emitAddonStatusChanged(AddonStatus status)
+{
+    emit addonStatusChanged(status);
 }

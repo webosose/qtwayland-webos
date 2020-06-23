@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2019 LG Electronics, Inc.
+// Copyright (c) 2013-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -77,6 +77,13 @@ public:
     };
     Q_DECLARE_FLAGS(KeyMasks, KeyMask)
 
+    enum AddonStatus {
+        AddonStatusNull,
+        AddonStatusLoaded,
+        AddonStatusDenied,
+        AddonStatusError,
+    };
+
     virtual ~WebOSShellSurface();
 
     QPointF position();
@@ -99,11 +106,17 @@ public:
     void setKeyMask(KeyMasks keyMask);
     void setInputRegion(const QRegion& region);
 
+    QString addon();
+    void setAddon(const QString& addon);
+    void resetAddon();
+
 signals:
     void positionChanged();
     void stateAboutToChange(Qt::WindowState state);
     void locationHintChanged();
     void keyMaskChanged();
+    void addonChanged();
+    void addonStatusChanged(AddonStatus status);
 
 private:
     WebOSShellSurface(wl_webos_shell_surface* s, struct ::wl_shell_surface *ss, QPlatformWindow* parent);
@@ -112,6 +125,8 @@ private:
     void emitStateAboutToChange(Qt::WindowState state);
     void emitLocationHintChanged();
     void emitKeyMaskChanged();
+    void emitAddonChanged();
+    void emitAddonStatusChanged(AddonStatus state);
 
     WebOSShellSurfacePrivate *d_ptr;
     Q_DISABLE_COPY(WebOSShellSurface);

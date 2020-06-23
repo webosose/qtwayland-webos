@@ -55,6 +55,10 @@ public:
     WebOSShellSurface::KeyMasks keyMask();
     void setKeyMask(WebOSShellSurface::KeyMasks keyMask);
 
+    QString addon() const;
+    void setAddon(const QString& addon);
+    void resetAddon();
+
 #if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
     void setState(Qt::WindowState state);
 #else
@@ -63,6 +67,7 @@ public:
     QPointF position() { return m_position; }
     void positionChanged();
     void stateAboutToChange(Qt::WindowState state);
+    void addonStatusChanged(WebOSShellSurface::AddonStatus status);
 
     QVariantMap properties() const;
     QVariant property(const QString &name) const;
@@ -80,6 +85,7 @@ public:
     static void position_changed(void *data, struct wl_webos_shell_surface *wl_webos_shell_surface, int32_t x, int32_t y);
     static void exposed(void *data, struct wl_webos_shell_surface *wl_webos_shell_surface, struct wl_array *rectangles);
     static void state_about_to_change(void *data, struct wl_webos_shell_surface *wl_webos_shell_surface, uint32_t state);
+    static void addon_status_changed(void *data, struct wl_webos_shell_surface *wl_webos_shell_surface, uint32_t addon_status);
 
     wl_webos_shell_surface* m_shellSurface;
     QWaylandWindow* m_parent;
@@ -94,6 +100,7 @@ public:
 #else
     Qt::WindowStates m_state;
 #endif
+    QString m_addon;
 };
 
 #endif
