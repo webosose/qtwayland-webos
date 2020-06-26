@@ -18,6 +18,17 @@
 
 #include "weboseglclientbufferintegration.h"
 
+WebOSEglClientBuffer::WebOSEglClientBuffer(WebOSEglClientBufferIntegration* integration, wl_resource *bufferResource)
+    : WaylandEglClientBuffer(integration, bufferResource)
+    , m_webosIntegration(integration)
+{
+}
+
+bool WebOSEglClientBuffer::directUpdate(QQuickItem *item, uint32_t zpos)
+{
+    return m_webosIntegration->directUpdate(item, zpos, this);
+}
+
 WebOSEglClientBufferIntegration::WebOSEglClientBufferIntegration()
     : WaylandEglClientBufferIntegration()
 {
@@ -41,7 +52,11 @@ WebOSEglClientBufferIntegration::createBufferFor(wl_resource *buffer)
     if (m_externalBufferIntegration && (cBuffer = m_externalBufferIntegration->createBufferFor(buffer)))
         return cBuffer;
 
-    return WaylandEglClientBufferIntegration::createBufferFor(buffer);
+    // Need to be updated along with WaylandEglClientBufferIntegration::createBufferFor
+    if (wl_shm_buffer_get(buffer))
+        return nullptr;
+
+    return new WebOSEglClientBuffer(this, buffer);
 }
 
 bool WebOSEglClientBufferIntegration::isSecured(struct ::wl_resource *buffer)
@@ -70,3 +85,7 @@ void WebOSEglClientBufferIntegration::loadExternalBufferIntegration()
     }
 }
 
+bool WebOSEglClientBufferIntegration::directUpdate(QQuickItem *item, uint32_t zpos, QtWayland::ClientBuffer *buffer)
+{
+    return m_externalBufferIntegration && m_externalBufferIntegration->directUpdate(item, zpos, buffer);
+}

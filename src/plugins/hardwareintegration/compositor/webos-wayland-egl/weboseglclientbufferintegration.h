@@ -16,7 +16,19 @@
 
 #include <QtWaylandCompositor/private/waylandeglclientbufferintegration.h>
 
-class QualCommGbmBufferIntegration;
+#include <QQuickItem>
+
+class WebOSEglClientBufferIntegration;
+
+class WebOSEglClientBuffer : public WaylandEglClientBuffer
+{
+public:
+    WebOSEglClientBuffer(WebOSEglClientBufferIntegration* integration, wl_resource *bufferResource);
+    bool directUpdate(QQuickItem *item, uint32_t zpos) override;
+
+private:
+    WebOSEglClientBufferIntegration *m_webosIntegration = nullptr;
+};
 
 class WebOSEglClientBufferIntegration : public WaylandEglClientBufferIntegration
 {
@@ -27,6 +39,9 @@ public:
     QtWayland::ClientBuffer *createBufferFor(wl_resource *buffer) override;
     bool isSecured(struct ::wl_resource *buffer) override;
 
+    bool supportsSetOverlayBufferObject();
+
+    bool directUpdate(QQuickItem *item, uint32_t zpos, QtWayland::ClientBuffer *buffer) override;
 private:
     void loadExternalBufferIntegration();
 
