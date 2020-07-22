@@ -54,6 +54,9 @@ public:
     QWaylandEglClientBufferIntegration* m_clientBufferIntegration;
     bool m_displayDestroyed;
     bool m_clientBufferIntegrationDestroyed;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    bool m_initialized;
+#endif
 };
 
 
@@ -69,6 +72,9 @@ WebOSAppSnapshotManagerPrivate::WebOSAppSnapshotManagerPrivate(QWaylandDisplay* 
     , m_clientBufferIntegration(cbi)
     , m_displayDestroyed(false)
     , m_clientBufferIntegrationDestroyed(false)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    , m_initialized(false)
+#endif
 {
 }
 
@@ -91,13 +97,14 @@ bool WebOSAppSnapshotManagerPrivate::preDumpInternal()
     }
 
     if (!m_displayDestroyed) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QList<QWaylandScreen*> screens = m_display->screens();
         WebOSIntegration* win = static_cast<WebOSIntegration*>(QGuiApplicationPrivate::platformIntegration());
         foreach (QWaylandScreen *screen, screens) {
             win->removeScreen(screen->screen());
             delete screen->screen();
         }
-
+#endif
         destroyAndLeaveDangling(m_display);
         m_displayDestroyed = true;
     }
@@ -129,6 +136,9 @@ void WebOSAppSnapshotManagerPrivate::recover()
     if (m_displayDestroyed) {
         connectToEventDispatcher(QGuiApplicationPrivate::eventDispatcher);
         m_display = new (m_display) QWaylandDisplay(static_cast<WebOSIntegration*>(QGuiApplicationPrivate::platformIntegration()));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        m_display->initialize();
+#endif
         m_displayDestroyed = false;
     }
 
@@ -141,6 +151,11 @@ void WebOSAppSnapshotManagerPrivate::recover()
 
 void WebOSAppSnapshotManagerPrivate::initializeWaylandIntegration()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (m_initialized)
+        return;
+    m_initialized = true;
+#endif
     WebOSIntegration *integration = static_cast<WebOSIntegration*>(QGuiApplicationPrivate::platformIntegration());
     integration->initialize();
 }
