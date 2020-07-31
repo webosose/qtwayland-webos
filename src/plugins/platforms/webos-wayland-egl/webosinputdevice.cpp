@@ -15,6 +15,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "webosinputdevice_p.h"
+#include "webosplatformwindow_p.h"
 #include <QtWaylandClient/private/qwaylanddisplay_p.h>
 #include <QtWaylandClient/private/qwaylandtouch_p.h>
 #include <QtGlobal>
@@ -137,8 +138,8 @@ void WebOSInputDevice::WebOSKeyboard::keyboard_key(uint32_t serial, uint32_t tim
 
 WebOSInputDevice::WebOSPointer::WebOSPointer(QWaylandInputDevice *device)
     : Pointer(device)
+    , m_origin(QPointF(0, 0))
 {
-
 }
 
 void WebOSInputDevice::WebOSPointer::pointer_enter(uint32_t serial, struct wl_surface *surface, wl_fixed_t sx, wl_fixed_t sy)
@@ -150,14 +151,24 @@ void WebOSInputDevice::WebOSPointer::pointer_enter(uint32_t serial, struct wl_su
     if (!surface)
         return;
 
-    QWaylandWindow *window = QWaylandWindow::fromWlSurface(surface);
-
-    mFocus = window;
-
     WebOSInputDevice *parent = static_cast<WebOSInputDevice*>(mParent);
     parent->setTime(QWaylandDisplay::currentTimeMillisec());
     parent->setSerial(serial);
     mEnterSerial = serial;
+
+    QWaylandWindow *window = QWaylandWindow::fromWlSurface(surface);
+
+    if (mFocus != window) {
+        mFocus = window;
+        WebOSPlatformWindow *ww = static_cast<WebOSPlatformWindow *>(mFocus.data());
+        m_origin = ww->position();
+        connect(ww, &WebOSPlatformWindow::resizeRequested, parent, [this] {
+            this->pauseEvents();
+        });
+        connect(ww, &WebOSPlatformWindow::positionChanged, parent, [this](const QPointF &position) {
+            this->flushPausedEvents(position);
+        });
+    }
 
     QWaylandWindow *grab = QWaylandWindow::mouseGrab();
     if (!grab) {
@@ -167,12 +178,132 @@ void WebOSInputDevice::WebOSPointer::pointer_enter(uint32_t serial, struct wl_su
     }
 }
 
+void WebOSInputDevice::WebOSPointer::pointer_leave(uint32_t time, struct wl_surface *surface)
+{
+    PMTRACE_FUNCTION;
+
+    WebOSInputDevice *parent = static_cast<WebOSInputDevice*>(mParent);
+    WebOSPlatformWindow *ww = static_cast<WebOSPlatformWindow *>(QWaylandWindow::fromWlSurface(surface));
+    if (ww)
+        ww->disconnect(parent);
+
+    if (Q_UNLIKELY(m_paused))
+        flushPausedEvents();
+
+    Pointer::pointer_leave(time, surface);
+}
+
 void WebOSInputDevice::WebOSPointer::pointer_motion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y)
 {
     PMTRACE_FUNCTION;
+
     if (!mFocus)
         return;
+
+    if (Q_UNLIKELY(m_paused)) {
+        qDebug() << "Delayed pointer_motion:" << time << wl_fixed_to_double(surface_x) << wl_fixed_to_double(surface_y);
+        Event e;
+        e.type = Type::motion;
+        e.args.motion = {time, surface_x, surface_y};
+        m_pendingEvents << e;
+        return;
+    }
+
     Pointer::pointer_motion(time, surface_x / mFocus->devicePixelRatio(), surface_y / mFocus->devicePixelRatio());
+}
+
+void WebOSInputDevice::WebOSPointer::pointer_button(uint32_t serial, uint32_t time, uint32_t button, uint32_t state)
+{
+    PMTRACE_FUNCTION;
+
+    if (!mFocus)
+        return;
+
+    if (Q_UNLIKELY(m_paused)) {
+        qDebug() << "Delayed pointer_button:" << serial << time << button << state;
+        Event e;
+        e.type = Type::button;
+        e.args.button = {serial, time, button, state};
+        m_pendingEvents << e;
+        return;
+    }
+
+    Pointer::pointer_button(serial, time, button, state);
+}
+
+void WebOSInputDevice::WebOSPointer::pointer_axis(uint32_t time, uint32_t axis, int32_t value)
+{
+    PMTRACE_FUNCTION;
+
+    if (!mFocus)
+        return;
+
+    if (Q_UNLIKELY(m_paused)) {
+        qDebug() << "Delayed pointer_axis:" << time << axis << value;
+        Event e;
+        e.type = Type::axis;
+        e.args.axis = {time, axis, value};
+        m_pendingEvents << e;
+        return;
+    }
+
+    Pointer::pointer_axis(time, axis, value);
+}
+
+void WebOSInputDevice::WebOSPointer::pauseEvents()
+{
+    m_paused = true;
+    // Pause events upto the given interval just in case the compositor doesn't respond
+    connect(&m_pauseTimer, &QTimer::timeout, static_cast<WebOSInputDevice*>(mParent), [this] {
+        this->flushPausedEvents();
+    });
+    m_pauseTimer.setSingleShot(true);
+    m_pauseTimer.setInterval(500);
+    m_pauseTimer.start();
+    qDebug() << "Start delayed pointer event handling, current origin:" << m_origin;
+}
+
+void WebOSInputDevice::WebOSPointer::flushPausedEvents(const QPointF &origin)
+{
+    if (!m_paused)
+        return;
+
+    m_paused = false;
+    m_pauseTimer.stop();
+
+    QPointF newOrigin = origin;
+    if (newOrigin.isNull())
+        newOrigin = m_origin;
+
+    qreal dx = m_origin.x() - newOrigin.x();
+    qreal dy = m_origin.y() - newOrigin.y();
+
+    // Replay queued events with coordinates translated to newOrigin
+    while (!m_pendingEvents.isEmpty()) {
+        Event e = m_pendingEvents.takeFirst();
+        switch (e.type) {
+        case Type::motion:
+            qDebug() << "Sending delayed pointer_motion(adjusted):" << e.args.motion.time
+                << wl_fixed_to_double(e.args.motion.surface_x) << "+" << dx
+                << wl_fixed_to_double(e.args.motion.surface_y) << "+" << dy;
+            pointer_motion(e.args.motion.time, e.args.motion.surface_x + wl_fixed_from_double(dx), e.args.motion.surface_y + wl_fixed_from_double(dy));
+            break;
+        case Type::button:
+            qDebug() << "Sending delayed pointer_button:" << e.args.button.serial << e.args.button.time
+                << e.args.button.button << e.args.button.state;
+            pointer_button(e.args.button.serial, e.args.button.time, e.args.button.button, e.args.button.state);
+            break;
+        case Type::axis:
+            qDebug() << "Sending delayed pointer_axis:" << e.args.axis.time
+                << e.args.axis.axis << e.args.axis.value;
+            pointer_axis(e.args.axis.time, e.args.axis.axis, e.args.axis.value);
+            break;
+        }
+    }
+
+    qDebug() << "End delayed pointer event handling with origin:" << newOrigin;
+
+    m_origin = newOrigin;
 }
 
 WebOSInputDevice::WebOSTouch::WebOSTouch(QWaylandInputDevice *device)

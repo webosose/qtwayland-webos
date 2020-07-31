@@ -27,6 +27,7 @@ using QtWaylandClient::QWaylandInputDevice;
 
 class WebOSPlatformWindow : public QWaylandEglWindow
 {
+    Q_OBJECT
 public:
     WebOSPlatformWindow(QWindow *window);
 
@@ -37,6 +38,13 @@ public:
 #endif
 
     void setGeometry(const QRect &rect) Q_DECL_OVERRIDE;
+
+    // Global position notified by the compositor
+    QPointF position() const { return m_position; }
+
+signals:
+    void resizeRequested(const QSize &oldSize, const QSize &newSize);
+    void positionChanged(const QPointF &position);
 
 private:
 #if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
@@ -49,7 +57,6 @@ private:
     void restoreMouseCursor(QWaylandInputDevice *device) Q_DECL_OVERRIDE;
 
 private slots:
-    void onPositionChanged();
     void onOutputTransformChanged();
     void onDevicePixelRatioChanged();
     void onScreenChanged(QScreen *screen);
@@ -63,6 +70,8 @@ private:
 #else
     Qt::WindowStates mState;
 #endif
+
+    QPointF m_position;
 };
 
 #endif

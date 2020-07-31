@@ -40,6 +40,7 @@ WebOSPlatformWindow::WebOSPlatformWindow(QWindow *window)
     : QWaylandEglWindow(window)
     , m_autoOrientation(true)
     , mState(Qt::WindowNoState)
+    , m_position(QPointF(0, 0))
 {
     setWindowStateInternal(window->windowState());
 
@@ -51,7 +52,11 @@ WebOSPlatformWindow::WebOSPlatformWindow(QWindow *window)
     WebOSShellSurfacePrivate* ssp = static_cast<WebOSShellSurfacePrivate *>(shellSurface());
     if (ssp) {
         WebOSShellSurface* ss = ssp->shellSurface();
-        QObject::connect(ss, &WebOSShellSurface::positionChanged, this, &WebOSPlatformWindow::onPositionChanged);
+        QObject::connect(ss, &WebOSShellSurface::positionChanged, [this, ss] {
+            m_position = ss->position();
+            setGeometry(QRect(m_position.x(), m_position.y(), geometry().width(), geometry().height()));
+            emit positionChanged(m_position);
+        });
     }
 
     WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
@@ -122,6 +127,9 @@ void WebOSPlatformWindow::setGeometry(const QRect &rect)
         m_initialGeometry = rect;
     }
 
+    if (geometry().size() != rect.size())
+        emit resizeRequested(geometry().size(), rect.size());
+
     QWaylandEglWindow::setGeometry(rect);
     WebOSShellSurface *ss = webOSShellSurfaceFor(window());
     if (ss)
@@ -133,16 +141,6 @@ void WebOSPlatformWindow::setGeometry(const QRect &rect)
         if (WebOSScreen::compareOutputTransform(0, screen->currentTransform()))
             onOutputTransformChanged();
     }
-}
-
-void WebOSPlatformWindow::onPositionChanged()
-{
-    WebOSShellSurface *ss = webOSShellSurfaceFor(window());
-
-    Q_ASSERT(sender() == ss);
-    const QPointF &pos = ss->position();
-    setGeometry(QRect(pos.x(), pos.y(),
-                geometry().width(), geometry().height()));
 }
 
 void WebOSPlatformWindow::onOutputTransformChanged()

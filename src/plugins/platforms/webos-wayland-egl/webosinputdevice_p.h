@@ -65,8 +65,49 @@ class WebOSInputDevice::WebOSPointer : public QWaylandInputDevice::Pointer
 public:
     WebOSPointer(QWaylandInputDevice *device);
 
-    void pointer_enter(uint32_t serial, struct wl_surface *surface, wl_fixed_t sx, wl_fixed_t sy) Q_DECL_OVERRIDE;
-    void pointer_motion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y) Q_DECL_OVERRIDE;
+    void pointer_enter(uint32_t serial, struct wl_surface *surface, wl_fixed_t sx, wl_fixed_t sy) override;
+    void pointer_leave(uint32_t time, struct wl_surface *surface) override;
+    void pointer_motion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y) override;
+    void pointer_button(uint32_t serial, uint32_t time, uint32_t button, uint32_t state) override;
+    void pointer_axis(uint32_t time, uint32_t axis, int32_t value) override;
+
+    void pauseEvents();
+    void flushPausedEvents(const QPointF &origin = QPointF());
+
+private:
+    // Only events to be delayed
+    enum Type {
+        motion,
+        button,
+        axis
+    };
+
+    struct Event {
+        Type type;
+        union {
+            struct {
+                uint32_t time;
+                wl_fixed_t surface_x;
+                wl_fixed_t surface_y;
+            } motion;
+            struct {
+                uint32_t serial;
+                uint32_t time;
+                uint32_t button;
+                uint32_t state;
+            } button;
+            struct {
+                uint32_t time;
+                uint32_t axis;
+                int32_t value;
+            } axis;
+        } args;
+    };
+
+    QPointF m_origin;
+    bool m_paused = false;
+    QVector<Event> m_pendingEvents;
+    QTimer m_pauseTimer;
 };
 
 class WebOSInputDevice::WebOSTouch : public QWaylandInputDevice::Touch
