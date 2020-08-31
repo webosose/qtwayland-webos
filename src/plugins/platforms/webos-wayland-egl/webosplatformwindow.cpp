@@ -131,9 +131,6 @@ void WebOSPlatformWindow::setGeometry(const QRect &rect)
         emit resizeRequested(geometry().size(), rect.size());
 
     QWaylandEglWindow::setGeometry(rect);
-    WebOSShellSurface *ss = webOSShellSurfaceFor(window());
-    if (ss)
-        ss->setInputRegion(QRect(0, 0, geometry().width(), geometry().height()));
 
     // Handle transform for initial geometry
     if (initialize) {
