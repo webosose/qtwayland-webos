@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 LG Electronics, Inc.
+// Copyright (c) 2017-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +18,13 @@
 #define APPSNAPSHOTMANAGER_H
 
 #include <QObject>
+#include <functional>
 
 class QString;
 class QWindow;
 class AppSnapshotManagerPrivate;
+
+typedef std::function<void(void)> qttestability_callBackFunc;
 
 class AppSnapshotManager : public QObject
 {
@@ -45,6 +48,7 @@ public:
     bool dump();
     bool isPostDumped();
     bool isRestored();
+    static void qttestability_set_callback(qttestability_callBackFunc cb);
 
 signals:
     void stateChanged(const AppSnapshotManager::AppSnapShotState state, const QString failureReason);

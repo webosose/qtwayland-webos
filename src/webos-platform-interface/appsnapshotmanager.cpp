@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 LG Electronics, Inc.
+// Copyright (c) 2017-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+qttestability_callBackFunc cbForQtTestability;
 
 static char** dup_commmand_line_argv(const int argc, char** argv)
 {
@@ -313,15 +315,25 @@ bool AppSnapshotManagerPrivate::postDump()
     qDebug() << Q_FUNC_INFO;
 
     setAppSnapShotState(AppSnapshotManager::Dumped);
+    qDebug() << "status: cbForQtTestability, "
+             << "value: " << (cbForQtTestability)? "not_nullptr" : "nullptr";
 
     if (!postDumpInternal()) {
         qWarning() << "failure of postdump";
         setAppSnapShotState(AppSnapshotManager::Failure, "postdump");
+        if (cbForQtTestability) {
+            qDebug() << "cbForQtTestability is called";
+            cbForQtTestability();
+        }
         return false;
     }
 
     setAppSnapShotState(AppSnapshotManager::PostDumped);
 
+    if (cbForQtTestability) {
+        qDebug() << "cbForQtTestability is called";
+        cbForQtTestability();
+    }
     return true;
 }
 
@@ -330,14 +342,24 @@ bool AppSnapshotManagerPrivate::restore()
     qDebug() << Q_FUNC_INFO;
 
     setAppSnapShotState(AppSnapshotManager::Dumped);
+    qDebug() << "status: cbForQtTestability, "
+             << "value: " << (cbForQtTestability)? "not_nullptr" : "nullptr";
 
     if (!restoreInternal()) {
         qWarning() << "failure of restore";
         setAppSnapShotState(AppSnapshotManager::Failure, "restore");
+        if (cbForQtTestability) {
+            qDebug() << "cbForQtTestability is called";
+            cbForQtTestability();
+        }
         return false;
     }
-
     setAppSnapShotState(AppSnapshotManager::Restored);
+
+    if (cbForQtTestability) {
+        qDebug() << "cbForQtTestability is called";
+        cbForQtTestability();
+    }
 
     return true;
 }
@@ -413,4 +435,18 @@ bool AppSnapshotManager::isRestored()
 {
     Q_D(AppSnapshotManager);
     return (d->m_state == AppSnapshotManager::Restored);
+}
+
+void AppSnapshotManager::qttestability_set_callback(qttestability_callBackFunc cb)
+{
+    // qttestability registers to com.webos.trustd service during CRIU dump.
+    // So, set the callback about LSRegister.
+    // After CRIU dump or restore, call the callback function.
+    qDebug() << "qttestability_set_callback is called";
+    if (!cb) {
+        qDebug() << "received callback is nullptr";
+        return;
+    }
+    cbForQtTestability = std::move(cb);
+    return;
 }
