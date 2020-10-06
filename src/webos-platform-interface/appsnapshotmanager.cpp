@@ -315,8 +315,8 @@ bool AppSnapshotManagerPrivate::postDump()
     qDebug() << Q_FUNC_INFO;
 
     setAppSnapShotState(AppSnapshotManager::Dumped);
-    qDebug() << "status: cbForQtTestability, "
-             << "value: " << (cbForQtTestability)? "not_nullptr" : "nullptr";
+    qDebug() << "status:cbForQtTestability"
+             << "value:" << ((cbForQtTestability)? "not_nullptr" : "nullptr");
 
     if (!postDumpInternal()) {
         qWarning() << "failure of postdump";
@@ -342,8 +342,8 @@ bool AppSnapshotManagerPrivate::restore()
     qDebug() << Q_FUNC_INFO;
 
     setAppSnapShotState(AppSnapshotManager::Dumped);
-    qDebug() << "status: cbForQtTestability, "
-             << "value: " << (cbForQtTestability)? "not_nullptr" : "nullptr";
+    qDebug() << "status:cbForQtTestability"
+             << "value:" << ((cbForQtTestability)? "not_nullptr" : "nullptr");
 
     if (!restoreInternal()) {
         qWarning() << "failure of restore";
