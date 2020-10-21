@@ -1,20 +1,18 @@
-/* @@@LICENSE
- *
- *      Copyright (c) 2018-2020 LG Electronics, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * LICENSE@@@ */
+// Copyright (c) 2018-2020 LG Electronics, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// SPDX-License-Identifier: Apache-2.0
 
 #include "webostablet.h"
 #include "webostablet_p.h"
@@ -31,7 +29,7 @@
 
 WebOSTabletPrivate::WebOSTabletPrivate(QWaylandDisplay* display, uint32_t id)
     : QtWayland::wl_webos_tablet(display->wl_registry(), id, WEBOSTABLET_VERSION)
-    , q_ptr(0)
+    , q_ptr(nullptr)
 {
 }
 
@@ -64,7 +62,7 @@ void WebOSTabletPrivate::webos_tablet_tablet_event(wl_array *uniqueId, int32_t p
 
 WebOSTabletPrivate::~WebOSTabletPrivate()
 {
-    q_ptr = NULL;
+    q_ptr = nullptr;
 }
 
 WebOSTablet::WebOSTablet(QWaylandDisplay* display, uint32_t id)
