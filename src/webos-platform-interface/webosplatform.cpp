@@ -24,7 +24,6 @@
 #include "webostablet.h"
 
 #include <QDebug>
-#include <QProcessEnvironment>
 #include <QtGui/private/qguiapplication_p.h>
 #include <QtWaylandClient/private/qwaylandintegration_p.h>
 #ifdef HAS_CRIU
@@ -65,9 +64,13 @@ void WebOSPlatformPrivate::registry_global(void *data, struct wl_registry *regis
         p->m_inputManager = new WebOSInputManager(p->display(), id);
     } else if (interface == "wl_webos_foreign") {
         p->m_foreign = new WebOSForeign(p->display(), id);
-    } else if ((interface == "wl_webos_tablet") &&
-               QProcessEnvironment::systemEnvironment().contains("WEBOS_TABLET")) {
-        p->m_webosTablet = new WebOSTablet(p->display(), id);
+    } else if (interface == "wl_webos_tablet") {
+        bool ok = false;
+        int webos_tablet = qEnvironmentVariableIntValue("WEBOS_TABLET", &ok);
+        if (ok && webos_tablet) {
+            qInfo() << "Binding wl_webos_tablet as WEBOS_TABLET is set to" << webos_tablet;
+            p->m_webosTablet = new WebOSTablet(p->display(), id);
+        }
     }
 }
 
