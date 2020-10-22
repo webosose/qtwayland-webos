@@ -265,15 +265,18 @@ void WebOSInputDevice::WebOSPointer::pauseEvents()
 
 void WebOSInputDevice::WebOSPointer::flushPausedEvents(const QPointF &origin)
 {
-    if (!m_paused)
-        return;
-
-    m_paused = false;
-    m_pauseTimer.stop();
-
     QPointF newOrigin = origin;
     if (newOrigin.isNull())
         newOrigin = m_origin;
+
+    if (!m_paused) {
+        // Nothing to be done except for updating m_origin
+        m_origin = newOrigin;
+        return;
+    }
+
+    m_paused = false;
+    m_pauseTimer.stop();
 
     qreal dx = m_origin.x() - newOrigin.x();
     qreal dy = m_origin.y() - newOrigin.y();
@@ -301,7 +304,7 @@ void WebOSInputDevice::WebOSPointer::flushPausedEvents(const QPointF &origin)
         }
     }
 
-    qDebug() << "End delayed pointer event handling with origin:" << newOrigin;
+    qDebug() << "End delayed pointer event handling with origin:" << m_origin << "=>" << newOrigin;
 
     m_origin = newOrigin;
 }
