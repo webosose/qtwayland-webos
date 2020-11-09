@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2020 LG Electronics, Inc.
+// Copyright (c) 2013-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ WaylandInputContext::WaylandInputContext()
     , m_seat(0)
     , m_textModelFactory(0)
     , m_currentTextModel(0)
-    , m_pendingQueries(0)
+    , m_pendingQueries(Qt::ImEnabled)
     , m_isQueryPending(false)
     , m_isCleanupPending(false)
     , m_isActivationPending(false)
@@ -228,7 +228,7 @@ void WaylandInputContext::update(Qt::InputMethodQueries queries)
         updateSurroundingText(query.value(Qt::ImSurroundingText), query.value(Qt::ImCursorPosition), query.value(Qt::ImAnchorPosition));
     }
 
-    m_pendingQueries = 0;
+    m_pendingQueries = Qt::ImEnabled;
     m_isQueryPending = false;
 }
 
@@ -762,7 +762,7 @@ void WaylandInputContext::cleanup()
         m_currentTextModel = NULL;
     }
 
-    m_pendingQueries = 0;
+    m_pendingQueries = Qt::ImEnabled;
     m_isQueryPending = false;
     m_isCleanupPending = false;
     m_isActivationPending = false;
