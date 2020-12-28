@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019 LG Electronics, Inc.
+// Copyright (c) 2018-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,6 +61,8 @@ public:
     QString getWindowId();
     WebOSForeign::WebOSExportedType getWebOSExportedType();
 
+    void destroy();
+
     static inline WebOSExportedPrivate* get(WebOSExported* exported) {
         return exported->d_func();
     }
@@ -92,6 +94,8 @@ public:
 
     void requestPunchThrough(const QString& contextId);
     void attachSurface(QWaylandWindow* surface);
+
+    void destroy();
 
     static inline WebOSImportedPrivate* get(WebOSImported* imported) {
         return imported->d_func();

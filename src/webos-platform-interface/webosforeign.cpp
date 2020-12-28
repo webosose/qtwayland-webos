@@ -29,11 +29,14 @@ WebOSForeignPrivate::WebOSForeignPrivate(QWaylandDisplay* display,
                                          uint32_t id)
     : QtWayland::wl_webos_foreign(display->wl_registry(), id, 1)
     , q_ptr(0)
-{}
+{
+    qWarning() << "[Client:WebOSForeignPrivate] constructed:" << this;
+}
 
 WebOSForeignPrivate::~WebOSForeignPrivate()
 {
     q_ptr = NULL;
+    qWarning() << "[Client:WebOSForeignPrivate] destructed:" << this;
 }
 
 WebOSExported* WebOSForeignPrivate::export_element(QWindow* window, WebOSForeign::WebOSExportedType exportedType)
@@ -41,15 +44,26 @@ WebOSExported* WebOSForeignPrivate::export_element(QWindow* window, WebOSForeign
     if (!isInitialized())
         return NULL;
 
+    if (!window) {
+        qWarning() << "[Client:WebOSForeignPrivate] error: invalid window" << this;
+        return NULL;
+    }
+
     QWaylandWindow* qww = static_cast<QWaylandWindow*>(window->handle());
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    struct ::wl_webos_exported* wlExported = export_element(qww->wlSurface(), exportedType);
+    struct ::wl_webos_exported* wlExported = QtWayland::wl_webos_foreign::export_element(qww->wlSurface(), exportedType);
 #else
-    struct ::wl_webos_exported* wlExported = export_element(qww->object(), exportedType);
+    struct ::wl_webos_exported* wlExported = QtWayland::wl_webos_foreign::export_element(qww->object(), exportedType);
 #endif
     WebOSExported* exported = new WebOSExported(window);
     WebOSExportedPrivate* exported_p = WebOSExportedPrivate::get(exported);
     exported_p->init(wlExported);
+
+    qWarning() << "[Client:WebOSForeignPrivate] requested export_element("
+            << window->winId() << ","
+            << exportedType << ")"
+            << this;
+
     return exported;
 }
 
@@ -59,11 +73,16 @@ WebOSImported* WebOSForeignPrivate::import_element(const QString& windowId,
     if (!isInitialized())
         return NULL;
 
-    struct ::wl_webos_imported* wlImported =
-        QtWayland::wl_webos_foreign::import_element(windowId, exportedType);
+    struct ::wl_webos_imported* wlImported = QtWayland::wl_webos_foreign::import_element(windowId, exportedType);
     WebOSImported* imported = new WebOSImported(windowId, exportedType);
     WebOSImportedPrivate* imported_p = WebOSImportedPrivate::get(imported);
     imported_p->init(wlImported);
+
+    qWarning() << "[Client:WebOSForeignPrivate] requested import_element("
+            << windowId << ","
+            << exportedType << ")"
+            << this;
+
     return imported;
 }
 
@@ -72,10 +91,13 @@ WebOSForeign::WebOSForeign(QWaylandDisplay* display, uint32_t id)
 {
     Q_D(WebOSForeign);
     d->q_ptr = this;
+
+    qWarning() << "[Client:WebOSForeign] constructed:" << this;
 }
 
 WebOSForeign::~WebOSForeign()
 {
+    qWarning() << "[Client:WebOSForeign] destructed:" << this;
 }
 
 WebOSExported* WebOSForeign::export_element(QWindow* window, WebOSExportedType exportedType)
@@ -94,10 +116,14 @@ WebOSImported* WebOSForeign::import_element(const QString& windowId,
 WebOSExportedPrivate::WebOSExportedPrivate(QWindow* window)
     : q_ptr(0)
     , m_window(window)
-{}
+{
+    qWarning() << "[Client:WebOSExportedPrivate] constructed:" << this;
+}
 
 WebOSExportedPrivate::~WebOSExportedPrivate()
 {
+    qWarning() << "[Client:WebOSExportedPrivate] destructed:" << this;
+    destroy();
     q_ptr = NULL;
 }
 
@@ -182,9 +208,17 @@ WebOSForeign::WebOSExportedType WebOSExportedPrivate::getWebOSExportedType()
     return m_exportedType;
 }
 
+void WebOSExportedPrivate::destroy()
+{
+    if (QtWayland::wl_webos_exported::isInitialized()) {
+        qWarning() << "[Client:WebOSExportedPrivate] destroy:" << this;
+        QtWayland::wl_webos_exported::destroy();
+    }
+}
+
 void WebOSExportedPrivate::webos_exported_window_id_assigned(const QString &window_id, uint32_t exported_type)
 {
-    qInfo() << "window_id assigned:" << window_id;
+    qWarning() << "[Client:WebOSExported] window_id assigned:" << window_id;
     Q_Q(WebOSExported);
     m_windowId = window_id;
     m_exportedType = static_cast<WebOSForeign::WebOSExportedType>(exported_type);
@@ -196,10 +230,13 @@ WebOSExported::WebOSExported(QWindow *window)
 {
     Q_D(WebOSExported);
     d->q_ptr = this;
+
+    qWarning() << "[Client:WebOSExported] constructed:" << this;
 }
 
 WebOSExported::~WebOSExported()
 {
+    qWarning() << "[Client:WebOSExported] destructed:" << this;
 }
 
 void WebOSExported::setExportedWindow(const QRegion &sourceRegion, const QRegion &destinationRegion)
@@ -232,16 +269,26 @@ WebOSForeign::WebOSExportedType WebOSExported::getWebOSExportedType()
     return d->getWebOSExportedType();
 }
 
+void WebOSExported::destroy()
+{
+    Q_D(WebOSExported);
+    d->destroy();
+}
+
 WebOSImportedPrivate::WebOSImportedPrivate(const QString& windowId,
                           WebOSForeign::WebOSExportedType exportedType)
 
     : q_ptr(0)
     , m_windowId(windowId)
     , m_exportedType(exportedType)
-{}
+{
+    qWarning() << "[Client:WebOSImportedPrivate] constructed:" << this;
+}
 
 WebOSImportedPrivate::~WebOSImportedPrivate()
 {
+    qWarning() << "[Client:WebOSImportedPrivate] destructed:" << this;
+    destroy();
     q_ptr = NULL;
 }
 
@@ -259,16 +306,27 @@ void WebOSImportedPrivate::attachSurface(QWaylandWindow* surface)
 #endif
 }
 
+void WebOSImportedPrivate::destroy()
+{
+    if (QtWayland::wl_webos_imported::isInitialized()) {
+        qWarning() << "[Client:WebOSImportedPrivate] destroy:" << this;
+        QtWayland::wl_webos_imported::destroy();
+    }
+}
+
 WebOSImported::WebOSImported(const QString& windowId,
                              WebOSForeign::WebOSExportedType exportedType)
     : d_ptr(new WebOSImportedPrivate(windowId, exportedType))
 {
     Q_D(WebOSImported);
     d->q_ptr = this;
+
+    qWarning() << "[Client:WebOSImported] constructed:" << this;
 }
 
 WebOSImported::~WebOSImported()
 {
+    qWarning() << "[Client:WebOSImported] destructed:" << this;
 }
 
 void WebOSImported::requestPunchThrough(const QString& contextId)
@@ -281,4 +339,10 @@ void WebOSImported::attachSurface(QWindow* surface)
 {
     Q_D(WebOSImported);
     d->attachSurface(static_cast<QWaylandWindow*>(surface->handle()));
+}
+
+void WebOSImported::destroy()
+{
+    Q_D(WebOSImported);
+    d->destroy();
 }

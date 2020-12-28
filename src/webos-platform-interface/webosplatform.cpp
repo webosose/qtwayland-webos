@@ -63,10 +63,19 @@ void WebOSPlatformPrivate::registry_global(void *data, struct wl_registry *regis
         p->setShell(new WebOSShell(p->display(), id));
     } else if (interface == "wl_webos_surface_group_compositor") {
         p->m_groupCompositor = new WebOSSurfaceGroupCompositor(p->display(), id);
+
+        if (p->m_groupCompositor)
+            qWarning() << "[Client:WebOSPlatform] WebOSSurfaceGroupCompositor created:" << (p->m_groupCompositor);
     } else if (interface == "wl_webos_input_manager") {
         p->m_inputManager = new WebOSInputManager(p->display(), id);
+
+        if (p->m_inputManager)
+            qWarning() << "[Client:WebOSPlatform] WebOSInputManager created:" << (p->m_inputManager);
     } else if (interface == "wl_webos_foreign") {
         p->m_foreign = new WebOSForeign(p->display(), id);
+
+        if (p->m_foreign)
+            qWarning() << "[Client:WebOSPlatform] WebOSForeign created:" << (p->m_foreign);
     } else if (interface == "wl_webos_tablet") {
         bool ok = false;
         int webos_tablet = qEnvironmentVariableIntValue("WEBOS_TABLET", &ok);
