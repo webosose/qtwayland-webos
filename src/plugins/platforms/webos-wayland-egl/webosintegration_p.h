@@ -42,9 +42,6 @@ public:
     QWaylandCursor *createPlatformCursor(QWaylandScreen *screen) const Q_DECL_OVERRIDE;
     QWaylandScreen *createPlatformScreen(QWaylandDisplay *display, int version, uint32_t id) const Q_DECL_OVERRIDE;
     QWaylandInputDevice *createInputDevice(QWaylandDisplay *display, int version, uint32_t id) Q_DECL_OVERRIDE;
-#ifndef QT_NO_ACCESSIBILITY
-    QPlatformAccessibility *createPlatformAccessibility() const Q_DECL_OVERRIDE;
-#endif
 
     QVariant styleHint(StyleHint hint) const Q_DECL_OVERRIDE;
     bool hasCapability(QPlatformIntegration::Capability cap) const Q_DECL_OVERRIDE;

@@ -20,9 +20,6 @@
 
 #include <qpa/qplatforminputcontextfactory_p.h>
 #include <qpa/qplatforminputcontext.h>
-#ifndef QT_NO_ACCESSIBILITY
-#include <qpa/qplatformaccessibility.h>
-#endif
 
 #include "webosintegration_p.h"
 #include "webosplatformwindow_p.h"
@@ -45,9 +42,6 @@ WebOSIntegration::WebOSIntegration()
     mNativeInterface.reset(new WebOSNativeInterface(this));
     mDisplay.reset(new QWaylandDisplay(this));
     mClipboard.reset(new QWaylandClipboard(mDisplay.data()));
-#ifndef QT_NO_ACCESSIBILITY
-    mAccessibility.reset(WebOSIntegration::createPlatformAccessibility());
-#endif
 }
 
 WebOSIntegration::~WebOSIntegration()
@@ -114,16 +108,6 @@ QWaylandScreen *WebOSIntegration::createPlatformScreen(QWaylandDisplay *display,
 {
     return new WebOSScreen(display, version, id);
 }
-
-#ifndef QT_NO_ACCESSIBILITY
-QPlatformAccessibility *WebOSIntegration::createPlatformAccessibility() const
-{
-    if (qgetenv("WEBOS_LOAD_ACCESSIBILITY_PLUGIN").toInt() == 1)
-        return new QPlatformAccessibility();
-
-    return 0;
-}
-#endif
 
 QVariant WebOSIntegration::styleHint(StyleHint hint) const
 {
