@@ -49,6 +49,9 @@ public:
     void setWindowState(Qt::WindowStates state) override;
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void setVisible(bool visible) override;
+#endif
     void setGeometry(const QRect &rect) override;
 
     // Global position notified by the compositor

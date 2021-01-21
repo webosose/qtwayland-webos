@@ -22,6 +22,9 @@
 #include <webosshellsurface.h>
 #include <webosshellsurface_p.h>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtWaylandClient/private/qwaylandsurface_p.h>
+#endif
 #include <QtWaylandClient/private/qwaylandshellsurface_p.h>
 
 #include <QGuiApplication>
@@ -123,6 +126,30 @@ void WebOSPlatformWindow::setWindowState(Qt::WindowStates state)
     if (ss)
         ss->setState(state);
 }
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void WebOSPlatformWindow::setVisible(bool visible)
+{
+    static bool initialize = true;
+
+    if (initialize && visible) {
+        // Call setVisible once since QWaylandWindow::setVisible(false) was ignored.
+        initialize = false;
+        QWaylandWindow::setVisible(visible);
+    } else if (visible) {
+        mDisplay->flushRequests();
+        setGeometry(window()->geometry());
+    } else {
+        sendExposeEvent(QRect());
+        // In webOS, hide the window from the compositor by attaching a null buffer
+        // instead of destroying its resources
+        // TODO: Do we need to consider handleFrameCallback?
+        // Follow up after figure out what is the issue without considering the framecallback.
+        attach(0, 0, 0);
+        mSurface->commit();
+    }
+}
+#endif
 
 void WebOSPlatformWindow::setGeometry(const QRect &rect)
 {
