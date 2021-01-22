@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -138,6 +138,11 @@ void WebOSPlatformWindow::setGeometry(const QRect &rect)
         if (WebOSScreen::compareOutputTransform(0, screen->currentTransform()))
             onOutputTransformChanged();
     }
+}
+
+qreal WebOSPlatformWindow::devicePixelRatio() const
+{
+    return static_cast<WebOSScreen *>(waylandScreen())->devicePixelRatio();
 }
 
 void WebOSPlatformWindow::onOutputTransformChanged()

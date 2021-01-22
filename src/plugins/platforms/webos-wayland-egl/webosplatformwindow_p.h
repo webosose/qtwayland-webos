@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ public:
 
     // Global position notified by the compositor
     QPointF position() const { return m_position; }
+
+    qreal devicePixelRatio() const override;
 
 signals:
     void resizeRequested(const QSize &oldSize, const QSize &newSize);
