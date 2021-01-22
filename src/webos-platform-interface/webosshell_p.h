@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2020 LG Electronics, Inc.
+// Copyright (c) 2013-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
 #define WEBOSSHELL_P_H
 
 #include <QObject>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QHash>
+#endif
 #include <QWindow>
 #include <QtWaylandClient/private/qwayland-wayland.h>
 
@@ -38,7 +41,6 @@ using QtWaylandClient::QWaylandShellSurface;
 class WebOSShellPrivate {
 
 public:
-
     WebOSShellPrivate(QWaylandDisplay* display, uint32_t id);
     virtual ~WebOSShellPrivate();
     WebOSShellPrivate(const WebOSShellPrivate&) = delete;
@@ -49,10 +51,21 @@ public:
     }
 
     QWaylandShellSurface* createShellSurface(QPlatformWindow* window);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QWaylandShellSurface* preCreateShellSurface(QPlatformWindow* window);
+    void setWlShell(QtWayland::wl_shell *wlShell) { m_wlShell = wlShell; }
 
-    wl_webos_shell* m_shell;
-    QtWayland::wl_shell* m_wlShell;
-    QWaylandDisplay* m_display;
+    static void registry_global(void *data, struct wl_registry *registry, uint32_t id, const QString &interface, uint32_t version);
+#endif
+
+private:
+    wl_webos_shell *m_shell = nullptr;
+    QtWayland::wl_shell *m_wlShell = nullptr;
+    QWaylandDisplay *m_display = nullptr;
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QHash<QPlatformWindow *, QWaylandShellSurface *> m_preCreatedShellSurfaces;
+#endif
 };
 
 

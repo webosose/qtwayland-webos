@@ -40,10 +40,12 @@ static bool platformWindowCreated(QWindow* w)
 }
 
 WebOSShellPrivate::WebOSShellPrivate(QWaylandDisplay* display, uint32_t id)
-    : m_wlShell(nullptr)
-    , m_display(display)
+    : m_display(display)
 {
     m_shell = static_cast<wl_webos_shell*>(wl_registry_bind(display->wl_registry(), id, &wl_webos_shell_interface, 2));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    display->addRegistryListener(WebOSShellPrivate::registry_global, this);
+#endif
 }
 
 WebOSShellPrivate::~WebOSShellPrivate()
@@ -54,8 +56,32 @@ WebOSShellPrivate::~WebOSShellPrivate()
     }
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void WebOSShellPrivate::registry_global(void *data, struct wl_registry *registry, uint32_t id, const QString &interface, uint32_t version)
+{
+    WebOSShellPrivate *ssp = static_cast<WebOSShellPrivate *>(data);
+
+    if (interface == "wl_shell")
+        ssp->setWlShell(new QtWayland::wl_shell(registry, id, version));
+}
+
+QWaylandShellSurface *WebOSShellPrivate::preCreateShellSurface(QPlatformWindow* window)
+{
+    if (m_preCreatedShellSurfaces.contains(window))
+        qInfo() << m_preCreatedShellSurfaces[window] << "is already pre-created for" << window;
+    else
+        m_preCreatedShellSurfaces[window] = createShellSurface(window);
+
+    return m_preCreatedShellSurfaces[window];
+}
+#endif
+
 QWaylandShellSurface* WebOSShellPrivate::createShellSurface(QPlatformWindow* window)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (m_preCreatedShellSurfaces.contains(window))
+        return m_preCreatedShellSurfaces.take(window);
+#else
     // Moved from qwaylandwlshellintegration.cpp
     if (m_wlShell) {
         delete m_wlShell;
@@ -68,6 +94,7 @@ QWaylandShellSurface* WebOSShellPrivate::createShellSurface(QPlatformWindow* win
             break;
         }
     }
+#endif
 
     if (m_wlShell) {
         QWaylandWindow* waylandWindow = static_cast<QWaylandWindow*>(window);
@@ -80,8 +107,11 @@ QWaylandShellSurface* WebOSShellPrivate::createShellSurface(QPlatformWindow* win
 #endif
         if (webos_shell_surface && shell_surface)
             return WebOSShellSurfacePrivate::get(new WebOSShellSurface(webos_shell_surface, shell_surface, window));
+
+        qCritical() << "Failed to create webos_shell_surface shell_surfaces: " <<  webos_shell_surface << shell_surface;
     }
 
+    qCritical() << "Failed to create webos_shell_surface m_wlShell: " << m_wlShell;
     return 0;
 }
 
@@ -96,10 +126,19 @@ WebOSShell::~WebOSShell()
 
 WebOSShellSurface* WebOSShell::shellSurfaceFor(QWindow* window)
 {
+    Q_D(WebOSShell);
+
     WebOSShellSurfacePrivate* ssp = NULL;
-    if (platformWindowCreated(window)) {
-        QWaylandWindow* qww = static_cast<QWaylandWindow*>(window->handle());
-        ssp = static_cast<WebOSShellSurfacePrivate *>(qww->shellSurface());
-    }
+    if (!platformWindowCreated(window))
+        return nullptr;
+
+    QWaylandWindow* qww = static_cast<QWaylandWindow*>(window->handle());
+    ssp = static_cast<WebOSShellSurfacePrivate *>(qww->shellSurface());
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (!ssp)
+       ssp =  static_cast<WebOSShellSurfacePrivate *>(d->preCreateShellSurface(qww));
+#endif
+
     return ssp ? ssp->shellSurface() : NULL;
 }

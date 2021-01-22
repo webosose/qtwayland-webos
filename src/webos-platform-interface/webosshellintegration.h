@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,10 +34,11 @@ public:
     WebOSShellIntegration();
     virtual ~WebOSShellIntegration();
 
-    bool initialize(QWaylandDisplay *display);
-    QWaylandShellSurface *createShellSurface(QWaylandWindow *window);
+    bool initialize(QWaylandDisplay *display) override;
+    QWaylandShellSurface *createShellSurface(QWaylandWindow *window) override;
     QWaylandDisplay *display() { return m_display; }
 
+private:
     static void registry_global(void *data, struct wl_registry *registry, uint32_t id, const QString &interface, uint32_t version);
 };
 

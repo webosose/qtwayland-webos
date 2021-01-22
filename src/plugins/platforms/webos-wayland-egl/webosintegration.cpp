@@ -78,6 +78,12 @@ QPlatformWindow *WebOSIntegration::createPlatformWindow(QWindow *window) const
     }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    // This will initialize shellIntegration if it is not ready yet
+    if (!shellIntegration()) {
+        qCritical("Shell integration is not ready", integrationName.data());
+        ::exit(1);
+    }
+
     return new WebOSPlatformWindow(window, mDisplay.data());
 #else
     return new WebOSPlatformWindow(window);
