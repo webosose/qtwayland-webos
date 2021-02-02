@@ -1,4 +1,4 @@
-// Copyright (c) 2020 LG Electronics, Inc.
+// Copyright (c) 2020-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,68 +24,7 @@ WebOSEglClientBuffer::WebOSEglClientBuffer(WebOSEglClientBufferIntegration* inte
 {
 }
 
-bool WebOSEglClientBuffer::directUpdate(QQuickItem *item, uint32_t zpos)
-{
-    return m_webosIntegration->directUpdate(item, zpos, this);
-}
-
 WebOSEglClientBufferIntegration::WebOSEglClientBufferIntegration()
     : WaylandEglClientBufferIntegration()
 {
-    loadExternalBufferIntegration();
-}
-
-void
-WebOSEglClientBufferIntegration::initializeHardware(struct ::wl_display *display)
-{
-    WaylandEglClientBufferIntegration::initializeHardware(display);
-
-    if (m_externalBufferIntegration)
-            m_externalBufferIntegration->initializeHardware(display);
-}
-
-QtWayland::ClientBuffer *
-WebOSEglClientBufferIntegration::createBufferFor(wl_resource *buffer)
-{
-    QtWayland::ClientBuffer *cBuffer = nullptr;
-
-    if (m_externalBufferIntegration && (cBuffer = m_externalBufferIntegration->createBufferFor(buffer)))
-        return cBuffer;
-
-    // Need to be updated along with WaylandEglClientBufferIntegration::createBufferFor
-    if (wl_shm_buffer_get(buffer))
-        return nullptr;
-
-    return new WebOSEglClientBuffer(this, buffer);
-}
-
-bool WebOSEglClientBufferIntegration::isSecured(struct ::wl_resource *buffer)
-{
-    if (m_externalBufferIntegration) {
-        return m_externalBufferIntegration->isSecured(buffer);
-    }
-
-    return false;
-}
-
-void WebOSEglClientBufferIntegration::loadExternalBufferIntegration()
-{
-    QStringList keys = QtWayland::ClientBufferIntegrationFactory::keys();
-    QString targetKey;
-    QByteArray clientBufferIntegration = qgetenv("WEBOS_EXTERNAL_BUFFER_INTEGRATION");
-    if (keys.contains(QString::fromLocal8Bit(clientBufferIntegration.constData()))) {
-        targetKey = QString::fromLocal8Bit(clientBufferIntegration.constData());
-    }
-
-    if (!targetKey.isEmpty()) {
-        m_externalBufferIntegration.reset(QtWayland::ClientBufferIntegrationFactory::create(targetKey, QStringList()));
-        if (m_externalBufferIntegration) {
-            //m_externalBufferIntegration->setCompositor(q); TODO: Need it?
-       }
-    }
-}
-
-bool WebOSEglClientBufferIntegration::directUpdate(QQuickItem *item, uint32_t zpos, QtWayland::ClientBuffer *buffer)
-{
-    return m_externalBufferIntegration && m_externalBufferIntegration->directUpdate(item, zpos, buffer);
 }

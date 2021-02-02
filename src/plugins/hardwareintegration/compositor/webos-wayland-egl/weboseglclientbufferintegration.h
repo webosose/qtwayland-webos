@@ -1,4 +1,4 @@
-// Copyright (c) 2020 LG Electronics, Inc.
+// Copyright (c) 2020-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,32 +20,17 @@
 
 class WebOSEglClientBufferIntegration;
 
-class WebOSEglClientBuffer : public WaylandEglClientBuffer
+class Q_WAYLAND_COMPOSITOR_EXPORT WebOSEglClientBuffer : public WaylandEglClientBuffer
 {
 public:
     WebOSEglClientBuffer(WebOSEglClientBufferIntegration* integration, wl_resource *bufferResource);
-    bool directUpdate(QQuickItem *item, uint32_t zpos) override;
 
 private:
     WebOSEglClientBufferIntegration *m_webosIntegration = nullptr;
 };
 
-class WebOSEglClientBufferIntegration : public WaylandEglClientBufferIntegration
+class Q_WAYLAND_COMPOSITOR_EXPORT WebOSEglClientBufferIntegration : public WaylandEglClientBufferIntegration
 {
 public:
     WebOSEglClientBufferIntegration();
-
-    void initializeHardware(struct ::wl_display *display) override;
-    QtWayland::ClientBuffer *createBufferFor(wl_resource *buffer) override;
-    bool isSecured(struct ::wl_resource *buffer) override;
-
-    bool supportsSetOverlayBufferObject();
-
-    bool directUpdate(QQuickItem *item, uint32_t zpos, QtWayland::ClientBuffer *buffer) override;
-private:
-    void loadExternalBufferIntegration();
-
-private:
-    QScopedPointer<QtWayland::ClientBufferIntegration> m_externalBufferIntegration;
 };
-
