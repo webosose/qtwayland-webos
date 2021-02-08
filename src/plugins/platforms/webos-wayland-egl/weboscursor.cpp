@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,14 +19,25 @@
 #include <QtGui/QPainter>
 #include <QDebug>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QtWaylandClient/private/qwaylandscreen_p.h>
+#endif
+
 #include "weboscursor_p.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+WebOSCursor::WebOSCursor(QWaylandDisplay *display)
+    : QWaylandCursor(display)
+    , mCustomCursorBuffer(0)
+{
+}
+#else
 WebOSCursor::WebOSCursor(QWaylandScreen *screen)
     : QWaylandCursor(screen)
     , mCustomCursorBuffer(0)
 {
-
 }
+#endif
 
 WebOSCursor::~WebOSCursor()
 {
@@ -47,7 +58,11 @@ void WebOSCursor::changeCursor(QCursor *cursor, QWindow *window)
         return;
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    struct wl_cursor_image *image = nullptr;
+#else
     struct wl_cursor_image *image = mCursorTheme->cursorImage(newShape);
+#endif
 
     if (image == nullptr) {
         qWarning() << "Could not get cursor";
@@ -74,7 +89,9 @@ void WebOSCursor::changeCursor(QCursor *cursor, QWindow *window)
         return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     mDisplay->setCursor(buffer, image, 1.0);
+#endif
 }
 
 void WebOSCursor::createBitmapCursor(QPixmap cursorPixmap, QPoint hotSpot)
@@ -94,5 +111,7 @@ void WebOSCursor::createBitmapCursor(QPixmap cursorPixmap, QPoint hotSpot)
     struct wl_cursor_image customCursorImage = {cursorPixmap.width(), cursorPixmap.height(),
                                                 hotSpot.x(), hotSpot.y(), 0};
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     mDisplay->setCursor(mCustomCursorBuffer->buffer(), &customCursorImage, 1.0);
+#endif
 }

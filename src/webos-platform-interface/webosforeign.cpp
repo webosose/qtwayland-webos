@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019 LG Electronics, Inc.
+// Copyright (c) 2018-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,11 @@ WebOSExported* WebOSForeignPrivate::export_element(QWindow* window, WebOSForeign
         return NULL;
 
     QWaylandWindow* qww = static_cast<QWaylandWindow*>(window->handle());
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    struct ::wl_webos_exported* wlExported = export_element(qww->wlSurface(), exportedType);
+#else
     struct ::wl_webos_exported* wlExported = export_element(qww->object(), exportedType);
+#endif
     WebOSExported* exported = new WebOSExported(window);
     WebOSExportedPrivate* exported_p = WebOSExportedPrivate::get(exported);
     exported_p->init(wlExported);
@@ -110,12 +114,12 @@ void WebOSExportedPrivate::setExportedWindow(const QRegion &sourceRegion, const 
     qreal dpr = m_window->devicePixelRatio();
 
     wl_region* wl_source_region = wl_compositor_create_region(wlcompositor);
-    Q_FOREACH (const QRect &sourceRect, m_sourceRegion.rects()) {
+    for (auto &sourceRect: m_sourceRegion) {
         wl_region_add(wl_source_region, sourceRect.x()*dpr, sourceRect.y()*dpr, sourceRect.width()*dpr, sourceRect.height()*dpr);
     }
 
     wl_region* wl_destination_region = wl_compositor_create_region(wlcompositor);
-    Q_FOREACH (const QRect &destinationRect, m_destinationRegion.rects()) {
+    for (auto &destinationRect: m_destinationRegion) {
         wl_region_add(wl_destination_region, destinationRect.x()*dpr, destinationRect.y()*dpr, destinationRect.width()*dpr, destinationRect.height()*dpr);
     }
 
@@ -139,17 +143,17 @@ void WebOSExportedPrivate::setCropRegion(const QRegion &originalInputRegion, con
     qreal dpr = m_window->devicePixelRatio();
 
     wl_region* wl_original_region = wl_compositor_create_region(wlcompositor);
-    Q_FOREACH (const QRect &originalRect, m_originalRegion.rects()) {
+    for (auto &originalRect: m_originalRegion) {
         wl_region_add(wl_original_region, originalRect.x()*dpr, originalRect.y()*dpr, originalRect.width()*dpr, originalRect.height()*dpr);
     }
 
     wl_region* wl_source_region = wl_compositor_create_region(wlcompositor);
-    Q_FOREACH (const QRect &sourceRect, m_sourceRegion.rects()) {
+    for (auto &sourceRect: m_sourceRegion) {
         wl_region_add(wl_source_region, sourceRect.x()*dpr, sourceRect.y()*dpr, sourceRect.width()*dpr, sourceRect.height()*dpr);
     }
 
     wl_region* wl_destination_region = wl_compositor_create_region(wlcompositor);
-    Q_FOREACH (const QRect &destinationRect, m_destinationRegion.rects()) {
+    for (auto &destinationRect: m_destinationRegion) {
         wl_region_add(wl_destination_region, destinationRect.x()*dpr, destinationRect.y()*dpr, destinationRect.width()*dpr, destinationRect.height()*dpr);
     }
 
@@ -248,7 +252,11 @@ void WebOSImportedPrivate::requestPunchThrough(const QString& contextId)
 
 void WebOSImportedPrivate::attachSurface(QWaylandWindow* surface)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    attach_surface(surface->wlSurface());
+#else
     attach_surface(surface->object());
+#endif
 }
 
 WebOSImported::WebOSImported(const QString& windowId,

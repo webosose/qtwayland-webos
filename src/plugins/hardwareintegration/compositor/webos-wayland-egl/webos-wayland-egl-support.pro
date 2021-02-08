@@ -20,10 +20,14 @@ load(qt_module)
 
 QT = waylandcompositor waylandcompositor-private core-private gui-private
 
+versionAtLeast(QT_VERSION, 6.0.0) {
+    QT += wayland_egl_compositor_hw_integration-private
+} else {
+    LIBS += -lQt5WaylandEglClientBufferIntegration
+}
+
 SOURCES += \
     weboseglclientbufferintegration.cpp
 
 HEADERS += \
     weboseglclientbufferintegration.h
-
-LIBS += -lQt5WaylandEglClientBufferIntegration

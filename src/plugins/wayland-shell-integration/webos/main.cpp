@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class WebOSShellIntegrationPlugin : public QWaylandShellIntegrationPlugin
     Q_OBJECT
     Q_PLUGIN_METADATA(IID QWaylandShellIntegrationFactoryInterface_iid FILE "webos.json")
 public:
-    QWaylandShellIntegration *create(const QString&, const QStringList&) Q_DECL_OVERRIDE;
+    QWaylandShellIntegration *create(const QString&, const QStringList&) override;
 };
 
 QWaylandShellIntegration *WebOSShellIntegrationPlugin::create(const QString& system, const QStringList& paramList)

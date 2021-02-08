@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,12 +19,18 @@
 
 #include <QtWaylandClient/private/qwaylandintegration_p.h>
 #include <QtWaylandClient/private/qwaylandscreen_p.h>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtWaylandClient/private/qwaylandnativeinterface_p.h>
+#endif
 
 using QtWaylandClient::QWaylandIntegration;
 using QtWaylandClient::QWaylandCursor;
 using QtWaylandClient::QWaylandScreen;
 using QtWaylandClient::QWaylandInputDevice;
 using QtWaylandClient::QWaylandDisplay;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using QtWaylandClient::QWaylandNativeInterface;
+#endif
 
 class WebOSIntegration : public QWaylandIntegration
 {
@@ -32,19 +38,24 @@ public:
     WebOSIntegration();
     ~WebOSIntegration();
 
+    QPlatformWindow *createPlatformWindow(QWindow *window) const override;
+    QWaylandScreen *createPlatformScreen(QWaylandDisplay *display, int version, uint32_t id) const override;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QWaylandCursor *createPlatformCursor(QWaylandDisplay *display) const override;
+    QWaylandInputDevice *createInputDevice(QWaylandDisplay *display, int version, uint32_t id) const override;
+    QWaylandNativeInterface *createPlatformNativeInterface() override;
+#else
+    QWaylandCursor *createPlatformCursor(QWaylandScreen *screen) const override;
+    QWaylandInputDevice *createInputDevice(QWaylandDisplay *display, int version, uint32_t id) override;
     void initialize() override;
+#endif
 
 #ifdef HAS_CRIU
     void resetInputContext();
 #endif
 
-    QPlatformWindow *createPlatformWindow(QWindow *window) const Q_DECL_OVERRIDE;
-    QWaylandCursor *createPlatformCursor(QWaylandScreen *screen) const Q_DECL_OVERRIDE;
-    QWaylandScreen *createPlatformScreen(QWaylandDisplay *display, int version, uint32_t id) const Q_DECL_OVERRIDE;
-    QWaylandInputDevice *createInputDevice(QWaylandDisplay *display, int version, uint32_t id) Q_DECL_OVERRIDE;
-
-    QVariant styleHint(StyleHint hint) const Q_DECL_OVERRIDE;
-    bool hasCapability(QPlatformIntegration::Capability cap) const Q_DECL_OVERRIDE;
+    QVariant styleHint(StyleHint hint) const override;
+    bool hasCapability(QPlatformIntegration::Capability cap) const override;
 };
 
 #endif

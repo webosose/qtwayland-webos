@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2020 LG Electronics, Inc.
+# Copyright (c) 2015-2021 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,12 @@
 PLUGIN_TYPE = platforms
 load(qt_plugin)
 
-QT += waylandclient-private egl_support-private
+QT += waylandclient-private
+versionAtLeast(QT_VERSION, 6.0.0) {
+    QT += wl_shell_integration-private wayland_egl_client_hw_integration-private
+} else {
+    QT += egl_support-private
+}
 
 qtConfig(xkbcommon) {
     QMAKE_USE_PRIVATE += xkbcommon

@@ -17,10 +17,18 @@
 #ifndef WEBOSWINDOW_H
 #define WEBOSWINDOW_H
 
+#include <QtCore/qglobal.h>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtWaylandEglClientHwIntegration/private/qwaylandeglwindow_p.h>
+#else
 #include "qwaylandeglwindow.h"
+#endif
 
 #include <QtWaylandClient/private/qwaylandcursor_p.h>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using QtWaylandClient::QWaylandDisplay;
+#endif
 using QtWaylandClient::QWaylandCursor;
 using QtWaylandClient::QWaylandEglWindow;
 using QtWaylandClient::QWaylandInputDevice;
@@ -29,15 +37,19 @@ class WebOSPlatformWindow : public QWaylandEglWindow
 {
     Q_OBJECT
 public:
-    WebOSPlatformWindow(QWindow *window);
-
-#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
-    void setWindowState(Qt::WindowState state) Q_DECL_OVERRIDE;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    WebOSPlatformWindow(QWindow *window, QWaylandDisplay *display);
 #else
-    void setWindowState(Qt::WindowStates state) Q_DECL_OVERRIDE;
+    WebOSPlatformWindow(QWindow *window);
 #endif
 
-    void setGeometry(const QRect &rect) Q_DECL_OVERRIDE;
+#if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
+    void setWindowState(Qt::WindowState state) override;
+#else
+    void setWindowState(Qt::WindowStates state) override;
+#endif
+
+    void setGeometry(const QRect &rect) override;
 
     // Global position notified by the compositor
     QPointF position() const { return m_position; }
@@ -55,8 +67,10 @@ private:
     bool setWindowStateInternal(Qt::WindowStates state);
 #endif
 
-    void handleMouseLeave(QWaylandInputDevice *inputDevice) Q_DECL_OVERRIDE;
-    void restoreMouseCursor(QWaylandInputDevice *device) Q_DECL_OVERRIDE;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    void handleMouseLeave(QWaylandInputDevice *inputDevice) override;
+    void restoreMouseCursor(QWaylandInputDevice *device) override;
+#endif
 
 private slots:
     void onOutputTransformChanged();

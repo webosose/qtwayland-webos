@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2020 LG Electronics, Inc.
+// Copyright (c) 2013-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -289,12 +289,16 @@ void WebOSShellSurfacePrivate::setInputRegion(const QRegion& region)
     wl_region *wlregion = wl_compositor_create_region(wlcompositor);
     qreal dpr = m_parent->window()->devicePixelRatio();
 
-    Q_FOREACH (const QRect &rect, region.rects()) {
+    for (auto &rect: region) {
         wl_region_add(wlregion, rect.x()*dpr, rect.y()*dpr,
                       rect.width()*dpr, rect.height()*dpr);
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    wl_surface *wlsurface = m_parent->wlSurface();
+#else
     wl_surface *wlsurface = static_cast<QtWayland::wl_surface *>(m_parent)->object();
+#endif
     wl_surface_set_input_region(wlsurface, wlregion);
     wl_surface_commit(wlsurface);
     wl_region_destroy(wlregion);

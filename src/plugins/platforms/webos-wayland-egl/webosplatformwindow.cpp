@@ -36,8 +36,13 @@ webOSShellSurfaceFor(QWindow *window)
     return shell ? shell->shellSurfaceFor(window) : NULL;
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+WebOSPlatformWindow::WebOSPlatformWindow(QWindow *window,  QWaylandDisplay *display)
+    : QWaylandEglWindow(window, display)
+#else
 WebOSPlatformWindow::WebOSPlatformWindow(QWindow *window)
     : QWaylandEglWindow(window)
+#endif
     , m_autoOrientation(true)
     , mState(Qt::WindowNoState)
     , m_position(QPointF(0, 0))
@@ -167,6 +172,7 @@ void WebOSPlatformWindow::onOutputTransformChanged()
     }
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void WebOSPlatformWindow::handleMouseLeave(QWaylandInputDevice *inputDevice)
 {
     if (mWindowDecoration) {
@@ -176,6 +182,7 @@ void WebOSPlatformWindow::handleMouseLeave(QWaylandInputDevice *inputDevice)
         QWindowSystemInterface::handleLeaveEvent(window());
     }
 }
+#endif
 
 void WebOSPlatformWindow::restoreMouseCursor(QWaylandInputDevice *device)
 {
@@ -189,7 +196,9 @@ void WebOSPlatformWindow::restoreMouseCursor(QWaylandInputDevice *device)
 
     //Do not use qt's setCursor here. Cause App's window cursor haven't chagned,
     //it will not affect current cursor shape, that is same shape.
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     waylandScreen()->waylandCursor()->changeCursor(cp, window());
+#endif
 }
 
 void WebOSPlatformWindow::onDevicePixelRatioChanged()

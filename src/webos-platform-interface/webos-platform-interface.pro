@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2020 LG Electronics, Inc.
+# Copyright (c) 2013-2021 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,13 @@
 TEMPLATE = lib
 
 QT += gui-private core-private waylandclient-private
+versionAtLeast(QT_VERSION, 6.0.0) {
+    QT += wl_shell_integration-private
+} else {
+    LIBS = -L$$[QT_INSTALL_PREFIX]/lib -lQt5WaylandShellSurface
+}
+
 CONFIG += link_pkgconfig wayland-scanner
-LIBS += -L$$[QT_INSTALL_PREFIX]/lib -lQt5WaylandShellSurface
 PKGCONFIG += wayland-webos-client wayland-client
 
 WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-webos/webos-surface-group.xml

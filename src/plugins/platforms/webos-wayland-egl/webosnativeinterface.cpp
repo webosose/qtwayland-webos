@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,13 @@
 #include <QtWaylandClient/private/qwaylandscreen_p.h>
 #include <QtWaylandClient/private/qwaylandintegration_p.h>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtWaylandEglClientHwIntegration/private/qwaylandglcontext_p.h>
+#include <QtWaylandEglClientHwIntegration/private/qwaylandeglclientbufferintegration_p.h>
+#else
 #include "qwaylandglcontext.h"
 #include "qwaylandeglclientbufferintegration.h"
+#endif
 #include "webosnativeinterface_p.h"
 #ifdef HAS_CRIU
 #include "webosappsnapshotmanager.h"

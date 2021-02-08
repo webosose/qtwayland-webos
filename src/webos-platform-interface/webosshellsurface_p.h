@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2019 LG Electronics, Inc.
+// Copyright (c) 2013-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,13 @@
 
 #include <wayland-client.h>
 #include <wayland-webos-shell-client-protocol.h>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+#include <QtWlShellIntegration/private/qwaylandwlshellsurface_p.h>
+#elif QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtWlShellSurface/private/qwaylandwlshellsurface_p.h>
+#else
 #include <QtWaylandClient/private/qwaylandwlshellsurface_p.h>
+#endif
 
 class QPlatformWindow;
 class WebOSShellSurface;
@@ -74,7 +80,7 @@ public:
     QVariant property(const QString &name, const QVariant &defaultValue) const;
     void setProperty(const QString &name, const QVariant &value);
 
-    void sendProperty(const QString &name, const QVariant &value) Q_DECL_OVERRIDE;
+    void sendProperty(const QString &name, const QVariant &value) override;
 
     void setInputRegion(const QRegion& region);
 

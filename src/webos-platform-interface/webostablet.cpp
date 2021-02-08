@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2020 LG Electronics, Inc.
+// Copyright (c) 2018-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,18 +43,24 @@ void WebOSTabletPrivate::webos_tablet_tablet_event(wl_array *uniqueId, int32_t p
     qint64 uid = 1;
     uid = uniqueIdArray.toLongLong(&ok, 10);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    int deviceType = int(QInputDevice::DeviceType::Stylus);
+#else
+    int deviceType = QTabletEvent::Stylus;
+#endif
+
     if (!state.lastReportTool && pointerType)
-        QWindowSystemInterface::handleTabletEnterProximityEvent(QTabletEvent::Stylus, pointerType, uid);
+        QWindowSystemInterface::handleTabletEnterProximityEvent(deviceType, pointerType, uid);
     bool down = buttons & Qt::LeftButton;
     QPointF globalPos(wl_fixed_to_double(globalX), wl_fixed_to_double(globalY));
     QWindowSystemInterface::handleTabletEvent(QGuiApplication::focusWindow(), globalPos, globalPos,
-                                              QTabletEvent::Stylus, pointerType,
+                                              deviceType, pointerType,
                                               (Qt::MouseButton)buttons, wl_fixed_to_double(pressure),
                                               xTilt, yTilt, 0, 0, 0, uid,
                                               qGuiApp->keyboardModifiers());
 
     if (state.lastReportTool && !pointerType)
-        QWindowSystemInterface::handleTabletLeaveProximityEvent(QTabletEvent::Stylus, pointerType, uid);
+        QWindowSystemInterface::handleTabletLeaveProximityEvent(deviceType, pointerType, uid);
 
     state.lastReportDown = down;
     state.lastReportTool = pointerType;

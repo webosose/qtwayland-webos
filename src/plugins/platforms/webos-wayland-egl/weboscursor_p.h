@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,12 +23,20 @@
 using QtWaylandClient::QWaylandCursor;
 using QtWaylandClient::QWaylandCursorTheme;
 using QtWaylandClient::QWaylandShmBuffer;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using QtWaylandClient::QWaylandDisplay;
+#else
 using QtWaylandClient::QWaylandScreen;
+#endif
 
 class WebOSCursor : public QWaylandCursor
 {
 public:
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    WebOSCursor(QWaylandDisplay *display);
+#else
     WebOSCursor(QWaylandScreen *screen);
+#endif
     ~WebOSCursor();
 private:
     void changeCursor(QCursor *cursor, QWindow *window);

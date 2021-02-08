@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 LG Electronics, Inc.
+// Copyright (c) 2017-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,13 @@
 
 #include "webosappsnapshotmanager.h"
 #include "appsnapshotmanager_p.h"
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtWaylandEglClientHwIntegration/private/qwaylandeglclientbufferintegration_p.h>
+#include <QtWaylandEglClientHwIntegration/private/qwaylandeglinclude_p.h>
+#else
 #include "qwaylandeglclientbufferintegration.h"
 #include "qwaylandeglinclude.h"
+#endif
 #include "webosintegration_p.h"
 
 #include <QDebug>
@@ -35,9 +40,9 @@ public:
 
     WebOSAppSnapshotManagerPrivate(QWaylandDisplay* dpy, QWaylandEglClientBufferIntegration* cbi);
 
-    bool preDumpInternal() Q_DECL_OVERRIDE;
-    bool postDumpInternal() Q_DECL_OVERRIDE;
-    bool restoreInternal() Q_DECL_OVERRIDE;
+    bool preDumpInternal() override;
+    bool postDumpInternal() override;
+    bool restoreInternal() override;
 
     void recover();
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ class WebOSScreen : public QObject, public QWaylandScreen
 public:
     WebOSScreen(QWaylandDisplay *display, int version, uint32_t id);
 
-    qreal devicePixelRatio() const Q_DECL_OVERRIDE;
+    qreal devicePixelRatio() const override;
 
-    void output_done() Q_DECL_OVERRIDE;
+    void output_done() override;
 
     int currentTransform() const { return mCurrentTransform; }
     static bool compareOutputTransform(const int& a, const int& b) { return (a % 2 != b % 2); }

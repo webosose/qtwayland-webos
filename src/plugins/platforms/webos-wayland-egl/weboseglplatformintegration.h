@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,21 +19,55 @@
 
 #include "webosintegration_p.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtWaylandEglClientHwIntegration/private/qwaylandeglclientbufferintegration_p.h>
+#else
 #include "qwaylandeglclientbufferintegration.h"
+#endif
 
 QT_BEGIN_NAMESPACE
 
 using QtWaylandClient::QWaylandEglClientBufferIntegration;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+class WebOSEglClientBufferIntegration : public QWaylandEglClientBufferIntegration
+{
+public:
+    bool supportsThreadedOpenGL() const override
+    {
+        static QByteArray threaded = qgetenv("WEBOS_GL_DISABLE_THREADED_RENDERING");
+        if (threaded.isEmpty())
+            return true;
+        else
+            return false;
+    }
+};
+#endif
+
 class WebOSEglPlatformIntegration : public WebOSIntegration
 {
 public:
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    WebOSEglPlatformIntegration()
+        : WebOSIntegration()
+        , m_client_buffer_integration(new WebOSEglClientBufferIntegration())
+    {
+    }
+
+    void initialize() override
+    {
+        WebOSIntegration::initialize();
+        //Do this after QWaylandIntegration::initialize to get proper display()
+        m_client_buffer_integration->initialize(display());
+    }
+#else
     WebOSEglPlatformIntegration()
         : WebOSIntegration()
         , m_client_buffer_integration(new QWaylandEglClientBufferIntegration())
     {
         m_client_buffer_integration->initialize(display());
     }
+#endif
 
     QWaylandEglClientBufferIntegration *clientBufferIntegration() const
     { return m_client_buffer_integration; }

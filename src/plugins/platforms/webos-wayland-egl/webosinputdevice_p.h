@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@
 using QtWaylandClient::QWaylandInputDevice;
 using QtWaylandClient::QWaylandDisplay;
 using QtWaylandClient::QWaylandWindow;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using QtWaylandClient::QWaylandSurface;
+#endif
 
 class WebOSInputDevice : public QWaylandInputDevice
 {
@@ -32,11 +35,11 @@ public:
 
     WebOSInputDevice(QWaylandDisplay *display, int version, uint32_t id);
 
-    QWaylandInputDevice::Keyboard *createKeyboard(QWaylandInputDevice *device) Q_DECL_OVERRIDE;
-    QWaylandInputDevice::Pointer *createPointer(QWaylandInputDevice *device) Q_DECL_OVERRIDE;
-    QWaylandInputDevice::Touch *createTouch(QWaylandInputDevice *device) Q_DECL_OVERRIDE;
+    QWaylandInputDevice::Keyboard *createKeyboard(QWaylandInputDevice *device) override;
+    QWaylandInputDevice::Pointer *createPointer(QWaylandInputDevice *device) override;
+    QWaylandInputDevice::Touch *createTouch(QWaylandInputDevice *device) override;
 
-    void seat_capabilities(uint32_t caps) Q_DECL_OVERRIDE;
+    void seat_capabilities(uint32_t caps) override;
     void registerTouchDevice();
 
     bool mTouchRegistered;
@@ -54,10 +57,12 @@ public:
     WebOSKeyboard(QWaylandInputDevice *device);
 
 #if QT_CONFIG(xkbcommon)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     std::pair<int, QString> keysymToQtKey(xkb_keysym_t keysym, Qt::KeyboardModifiers &modifiers) override;
 #endif
+#endif
 
-    void keyboard_key(uint32_t serial, uint32_t time, uint32_t key, uint32_t state) Q_DECL_OVERRIDE;
+    void keyboard_key(uint32_t serial, uint32_t time, uint32_t key, uint32_t state) override;
 };
 
 class WebOSInputDevice::WebOSPointer : public QWaylandInputDevice::Pointer
@@ -116,9 +121,9 @@ public:
     WebOSTouch(QWaylandInputDevice *device);
 
     void registerTouchDevice();
-    void touch_down(uint32_t serial, uint32_t time, struct wl_surface *surface, int32_t id, wl_fixed_t x, wl_fixed_t y) Q_DECL_OVERRIDE;
-    void touch_motion(uint32_t time, int32_t id, wl_fixed_t x, wl_fixed_t y) Q_DECL_OVERRIDE;
-    void touch_cancel() Q_DECL_OVERRIDE;
-    void touch_frame() Q_DECL_OVERRIDE;
+    void touch_down(uint32_t serial, uint32_t time, struct wl_surface *surface, int32_t id, wl_fixed_t x, wl_fixed_t y) override;
+    void touch_motion(uint32_t time, int32_t id, wl_fixed_t x, wl_fixed_t y) override;
+    void touch_cancel() override;
+    void touch_frame() override;
 };
 #endif

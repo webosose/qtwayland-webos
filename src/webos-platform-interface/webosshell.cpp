@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2020 LG Electronics, Inc.
+// Copyright (c) 2013-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -71,8 +71,13 @@ QWaylandShellSurface* WebOSShellPrivate::createShellSurface(QPlatformWindow* win
 
     if (m_wlShell) {
         QWaylandWindow* waylandWindow = static_cast<QWaylandWindow*>(window);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        struct wl_webos_shell_surface* webos_shell_surface = wl_webos_shell_get_shell_surface(m_shell, waylandWindow->wlSurface());
+        struct wl_shell_surface *shell_surface = m_wlShell->get_shell_surface(waylandWindow->wlSurface());
+#else
         struct wl_webos_shell_surface* webos_shell_surface = wl_webos_shell_get_shell_surface(m_shell, waylandWindow->object());
         struct wl_shell_surface *shell_surface = m_wlShell->get_shell_surface(waylandWindow->object());
+#endif
         if (webos_shell_surface && shell_surface)
             return WebOSShellSurfacePrivate::get(new WebOSShellSurface(webos_shell_surface, shell_surface, window));
     }

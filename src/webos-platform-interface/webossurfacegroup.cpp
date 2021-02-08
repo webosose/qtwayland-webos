@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,7 +43,11 @@ void WebOSSurfaceGroupPrivate::setAllowAnonymousLayers(bool allow)
 
 void WebOSSurfaceGroupPrivate::attachAnonymousSurface(QWaylandWindow* surface, WebOSSurfaceGroup::ZHint hint)
 {
-     attach_anonymous(surface->object(), (uint32_t)hint);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    attach_anonymous(surface->wlSurface(), (uint32_t)hint);
+#else
+    attach_anonymous(surface->object(), (uint32_t)hint);
+#endif
 }
 
 WebOSSurfaceGroupLayer* WebOSSurfaceGroupPrivate::createLayer(const QString& name, int z)
@@ -64,7 +68,11 @@ void WebOSSurfaceGroupPrivate::webos_surface_group_owner_destroyed()
 
     QMutableListIterator<QPointer<QWaylandWindow> > s(m_attachedSurfaces);
     while (s.hasNext()) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        detach(s.next().data()->wlSurface());
+#else
         detach(s.next().data()->object());
+#endif
         s.remove();
     }
 
@@ -73,13 +81,21 @@ void WebOSSurfaceGroupPrivate::webos_surface_group_owner_destroyed()
 
 void WebOSSurfaceGroupPrivate::attachSurface(QWaylandWindow* surface, const QString& layer)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    attach(surface->wlSurface(), layer);
+#else
     attach(surface->object(), layer);
+#endif
     m_attachedSurfaces << surface;
 }
 
 void WebOSSurfaceGroupPrivate::detachSurface(QWaylandWindow* surface)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    detach(surface->wlSurface());
+#else
     detach(surface->object());
+#endif
     m_attachedSurfaces.removeAll(surface);
 }
 

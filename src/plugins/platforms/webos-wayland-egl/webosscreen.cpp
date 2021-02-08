@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 #include <QByteArray>
 #include <QString>
-#include <QRegExp>
+#include <QtCore/QRegularExpression>
 #include <QUrlQuery>
 #include <QDebug>
 
@@ -45,13 +45,14 @@ void WebOSScreen::updateDevicePixelRatio()
 
     QByteArray dpr = qgetenv("WEBOS_DEVICE_PIXEL_RATIO");
     QString geom(qgetenv("WEBOS_WINDOW_BASE_GEOMETRY"));
-    QRegExp pattern("([0-9]+)x([0-9]+)");
+    QRegularExpression pattern("([0-9]+)x([0-9]+)");
     qreal ratio = (qreal) dpr.toDouble();
 
+    auto matchResult = pattern.match(geom);
     if (ratio > 0.0) {
         qInfo() << "Set devicePixelRatio as" << ratio << "by WEBOS_DEVICE_PIXEL_RATIO";
-    } else if (dpr.startsWith("auto") && pattern.indexIn(geom) >= 0) {
-        QStringList list = pattern.capturedTexts();
+    } else if (dpr.startsWith("auto") && matchResult.hasMatch()) {
+        QStringList list = matchResult.capturedTexts();
         int screenWidth = 0;
         int screenHeight = 0;
         switch (mCurrentTransform) {

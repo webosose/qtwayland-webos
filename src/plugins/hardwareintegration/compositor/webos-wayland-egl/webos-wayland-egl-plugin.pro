@@ -15,6 +15,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 QT = webos_egl_clientbuffer waylandcompositor-private
+versionAtLeast(QT_VERSION, 6.0.0) {
+    QT += wayland_egl_compositor_hw_integration-private
+}
 
 OTHER_FILES += webos-wayland-egl.json
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,11 @@ WebOSSurfaceGroupCompositorPrivate::WebOSSurfaceGroupCompositorPrivate(struct wl
 
 WebOSSurfaceGroup* WebOSSurfaceGroupCompositorPrivate::createGroup(QWaylandWindow* window, const QString &name)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+     struct ::wl_webos_surface_group* grp = create_surface_group(window->wlSurface(), name);
+#else
      struct ::wl_webos_surface_group* grp = create_surface_group(window->object(), name);
+#endif
      WebOSSurfaceGroup* group = new WebOSSurfaceGroup;
      WebOSSurfaceGroupPrivate* p_group = WebOSSurfaceGroupPrivate::get(group);
      p_group->init(grp);

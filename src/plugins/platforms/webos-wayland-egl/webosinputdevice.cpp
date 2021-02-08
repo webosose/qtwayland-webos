@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,18 @@
 #include "webosinputdevice_p.h"
 #include "webosplatformwindow_p.h"
 #include <QtWaylandClient/private/qwaylanddisplay_p.h>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtGui/QPointingDevice>
+#else
 #include <QtWaylandClient/private/qwaylandtouch_p.h>
+#endif
 #include <QtGlobal>
 #include <QDebug>
 
 #include <QtWaylandClient/private/qwaylanddisplay_p.h>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtWaylandClient/private/qwaylandsurface_p.h>
+#endif
 
 #include "qtwaylandwebostracer.h"
 
@@ -60,9 +67,16 @@ void WebOSInputDevice::seat_capabilities(uint32_t caps)
     if (caps & WL_SEAT_CAPABILITY_TOUCH && !mTouch) {
         // This substitues creation of QTouchDevice in QtWayland
         // Then, we will register it when real event comes up
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        // Create new pointing device (name, id, type, pointerType, maxPoints, uniquieId)
+        mTouchDevice = new QPointingDevice(QLatin1String("some touchscreen"), 0
+                , QInputDevice::DeviceType::TouchScreen, QPointingDevice::PointerType::Finger
+                , QInputDevice::Capability::Position, 10, 0);
+#else
         mTouchDevice = new QTouchDevice;
         mTouchDevice->setType(QTouchDevice::TouchScreen);
         mTouchDevice->setCapabilities(QTouchDevice::Position);
+#endif
     }
 
     QWaylandInputDevice::seat_capabilities(caps);
@@ -73,7 +87,11 @@ void WebOSInputDevice::registerTouchDevice()
     PMTRACE_FUNCTION;
     if (Q_UNLIKELY(!mTouchRegistered) && Q_LIKELY(mTouchDevice)) {
         mTouchRegistered = true;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QWindowSystemInterface::registerInputDevice(mTouchDevice);
+#else
         QWindowSystemInterface::registerTouchDevice(mTouchDevice);
+#endif
     }
 }
 
@@ -96,6 +114,8 @@ WebOSInputDevice::WebOSKeyboard::WebOSKeyboard(QWaylandInputDevice *device)
 }
 
 #if QT_CONFIG(xkbcommon)
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 std::pair<int, QString> WebOSInputDevice::WebOSKeyboard::keysymToQtKey(xkb_keysym_t keysym, Qt::KeyboardModifiers &modifiers)
 {
     int code = 0;
@@ -128,12 +148,16 @@ std::pair<int, QString> WebOSInputDevice::WebOSKeyboard::keysymToQtKey(xkb_keysy
 }
 #endif
 
+#endif // QT_CONFIG(xkbcommon)
+
 void WebOSInputDevice::WebOSKeyboard::keyboard_key(uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
 {
     PMTRACE_FUNCTION;
     Keyboard::keyboard_key(serial, time, key, state);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     //In WebOS, we don't support repeat key by qtwayland
     stopRepeat();
+#endif
 }
 
 WebOSInputDevice::WebOSPointer::WebOSPointer(QWaylandInputDevice *device)
@@ -151,16 +175,31 @@ void WebOSInputDevice::WebOSPointer::pointer_enter(uint32_t serial, struct wl_su
     if (!surface)
         return;
 
+    QWaylandWindow *window = QWaylandWindow::fromWlSurface(surface);
+    if (!window)
+        return;
+
     WebOSInputDevice *parent = static_cast<WebOSInputDevice*>(mParent);
     parent->setTime(QWaylandDisplay::currentTimeMillisec());
     parent->setSerial(serial);
     mEnterSerial = serial;
 
-    QWaylandWindow *window = QWaylandWindow::fromWlSurface(surface);
-
+    bool focusChanged = false;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QWaylandSurface *qwSurface = window->waylandSurface();
+    if (mFocus != qwSurface) {
+        mFocus = qwSurface;
+        focusChanged = true;
+    }
+#else
     if (mFocus != window) {
         mFocus = window;
-        WebOSPlatformWindow *ww = static_cast<WebOSPlatformWindow *>(mFocus.data());
+        focusChanged = true;
+    }
+#endif
+
+    if (focusChanged) {
+        WebOSPlatformWindow *ww = static_cast<WebOSPlatformWindow *>(window);
         m_origin = ww->position();
         connect(ww, &WebOSPlatformWindow::resizeRequested, parent, [this] {
             this->pauseEvents();
@@ -172,8 +211,13 @@ void WebOSInputDevice::WebOSPointer::pointer_enter(uint32_t serial, struct wl_su
 
     QWaylandWindow *grab = QWaylandWindow::mouseGrab();
     if (!grab) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QtWaylandClient::QWaylandPointerEvent enter(QEvent::Type::Enter, Qt::ScrollBegin, window,
+                parent->getTime(), mSurfacePos, mGlobalPos, mButtons, Qt::NoButton, parent->modifiers());
+#else
         QtWaylandClient::QWaylandPointerEvent enter(QtWaylandClient::QWaylandPointerEvent::Enter, parent->getTime(),
                 mSurfacePos, mGlobalPos, mButtons, parent->modifiers());
+#endif
         window->handleMouse(parent, enter);
     }
 }
@@ -197,8 +241,13 @@ void WebOSInputDevice::WebOSPointer::pointer_motion(uint32_t time, wl_fixed_t su
 {
     PMTRACE_FUNCTION;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (mFocus.isNull())
+        return;
+#else
     if (!mFocus)
         return;
+#endif
 
     if (Q_UNLIKELY(m_paused)) {
         qDebug() << "Delayed pointer_motion:" << time << wl_fixed_to_double(surface_x) << wl_fixed_to_double(surface_y);
@@ -209,15 +258,26 @@ void WebOSInputDevice::WebOSPointer::pointer_motion(uint32_t time, wl_fixed_t su
         return;
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QWaylandWindow *window = mFocus->waylandWindow();
+    if (window)
+        Pointer::pointer_motion(time, surface_x / window->devicePixelRatio(), surface_y / window->devicePixelRatio());
+#else
     Pointer::pointer_motion(time, surface_x / mFocus->devicePixelRatio(), surface_y / mFocus->devicePixelRatio());
+#endif
 }
 
 void WebOSInputDevice::WebOSPointer::pointer_button(uint32_t serial, uint32_t time, uint32_t button, uint32_t state)
 {
     PMTRACE_FUNCTION;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (mFocus.isNull())
+        return;
+#else
     if (!mFocus)
         return;
+#endif
 
     if (Q_UNLIKELY(m_paused)) {
         qDebug() << "Delayed pointer_button:" << serial << time << button << state;
@@ -235,8 +295,13 @@ void WebOSInputDevice::WebOSPointer::pointer_axis(uint32_t time, uint32_t axis, 
 {
     PMTRACE_FUNCTION;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (mFocus.isNull())
+        return;
+#else
     if (!mFocus)
         return;
+#endif
 
     if (Q_UNLIKELY(m_paused)) {
         qDebug() << "Delayed pointer_axis:" << time << axis << value;
@@ -335,8 +400,15 @@ void WebOSInputDevice::WebOSTouch::touch_down(uint32_t serial, uint32_t time, st
 void WebOSInputDevice::WebOSTouch::touch_motion(uint32_t time, int32_t id, wl_fixed_t x, wl_fixed_t y)
 {
     PMTRACE_FUNCTION;
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (mFocus.isNull())
+        return;
+#else
     if (!mFocus)
         return;
+#endif
+
     Touch::touch_motion(time, id, x / mFocus->devicePixelRatio(), y / mFocus->devicePixelRatio());
 }
 

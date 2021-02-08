@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,40 +34,26 @@ static int s_dragDistance = 10;
 using QtWaylandClient::QWaylandClipboard;
 
 WebOSIntegration::WebOSIntegration()
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    : QWaylandIntegration()
+#else
     : QWaylandIntegration(true)
+#endif
 {
     if (qEnvironmentVariableIsSet("WEBOS_DRAG_DISTANCE"))
         s_dragDistance = qgetenv("WEBOS_DRAG_DISTANCE").toInt();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     mNativeInterface.reset(new WebOSNativeInterface(this));
     mDisplay.reset(new QWaylandDisplay(this));
     mClipboard.reset(new QWaylandClipboard(mDisplay.data()));
+#endif
 }
 
 WebOSIntegration::~WebOSIntegration()
 {
     mInputContext.reset(nullptr);
 }
-
-void WebOSIntegration::initialize()
-{
-    // TODO
-    // Consider creating WaylandInputContext directly like other platform
-    // features rather than creating it via QPlatformInputContextFactory.
-    // We can pass QWaylandDisplay as constructor param so that it doesn't
-    // have to rely on the nativeInterface to get the wl_display.
-    // (See QWaylandInputContext as a reference.)
-    mInputContext.reset(QPlatformInputContextFactory::create());
-
-    QWaylandIntegration::initialize();
-}
-
-#ifdef HAS_CRIU
-void WebOSIntegration::resetInputContext()
-{
-    mInputContext.reset();
-}
-#endif
 
 QPlatformWindow *WebOSIntegration::createPlatformWindow(QWindow *window) const
 {
@@ -91,23 +77,67 @@ QPlatformWindow *WebOSIntegration::createPlatformWindow(QWindow *window) const
         ::exit(1);
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return new WebOSPlatformWindow(window, mDisplay.data());
+#else
     return new WebOSPlatformWindow(window);
-}
-
-QWaylandCursor *WebOSIntegration::createPlatformCursor(QWaylandScreen *screen) const
-{
-    return new WebOSCursor(screen);
-}
-
-QWaylandInputDevice *WebOSIntegration::createInputDevice(QWaylandDisplay *display, int version, uint32_t id)
-{
-    return new WebOSInputDevice(display, version, id);
+#endif
 }
 
 QWaylandScreen *WebOSIntegration::createPlatformScreen(QWaylandDisplay *display, int version, uint32_t id) const
 {
     return new WebOSScreen(display, version, id);
 }
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+QWaylandCursor *WebOSIntegration::createPlatformCursor(QWaylandDisplay *display) const
+{
+    return new WebOSCursor(display);
+}
+#else
+QWaylandCursor *WebOSIntegration::createPlatformCursor(QWaylandScreen *screen) const
+{
+    return new WebOSCursor(screen);
+}
+#endif
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+QWaylandInputDevice *WebOSIntegration::createInputDevice(QWaylandDisplay *display, int version, uint32_t id) const
+#else
+QWaylandInputDevice *WebOSIntegration::createInputDevice(QWaylandDisplay *display, int version, uint32_t id)
+#endif
+{
+    return new WebOSInputDevice(display, version, id);
+}
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+QWaylandNativeInterface *WebOSIntegration::createPlatformNativeInterface()
+{
+    return new WebOSNativeInterface(this);
+}
+#endif
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+void WebOSIntegration::initialize()
+{
+    // TODO
+    // Consider creating WaylandInputContext directly like other platform
+    // features rather than creating it via QPlatformInputContextFactory.
+    // We can pass QWaylandDisplay as constructor param so that it doesn't
+    // have to rely on the nativeInterface to get the wl_display.
+    // (See QWaylandInputContext as a reference.)
+    mInputContext.reset(QPlatformInputContextFactory::create());
+
+    QWaylandIntegration::initialize();
+}
+#endif
+
+#ifdef HAS_CRIU
+void WebOSIntegration::resetInputContext()
+{
+    mInputContext.reset();
+}
+#endif
 
 QVariant WebOSIntegration::styleHint(StyleHint hint) const
 {
