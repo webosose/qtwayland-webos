@@ -143,8 +143,24 @@ void WebOSPlatformWindow::setVisible(bool visible)
         sendExposeEvent(QRect());
         // In webOS, hide the window from the compositor by attaching a null buffer
         // instead of destroying its resources
-        // TODO: Do we need to consider handleFrameCallback?
-        // Follow up after figure out what is the issue without considering the framecallback.
+        QPointer<WebOSPlatformWindow> deleteGuard(this);
+        QWindowSystemInterface::flushWindowSystemEvents();
+        if (!deleteGuard.isNull()) {
+            // Delay hiding window if waiting for the frame callback (See WebOSPlatformWindow::doHandleFrameCallback())
+            if (!mWaitingForFrameCallback) {
+                attach(0, 0, 0);
+                mSurface->commit();
+            }
+        }
+    }
+}
+
+void WebOSPlatformWindow::doHandleFrameCallback()
+{
+    QWaylandWindow::doHandleFrameCallback();
+
+    // In webOS, send a null buffer if the window is invisible.
+    if (!window()->isVisible()) {
         attach(0, 0, 0);
         mSurface->commit();
     }
