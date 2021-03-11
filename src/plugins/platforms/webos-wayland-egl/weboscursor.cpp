@@ -17,9 +17,12 @@
 #include <wayland-cursor.h>
 #include <QtWaylandClient/private/qwaylanddisplay_p.h>
 #include <QtGui/QPainter>
+#include <QGuiApplication>
 #include <QDebug>
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtWaylandClient/private/qwaylandinputdevice_p.h>
+#else
 #include <QtWaylandClient/private/qwaylandscreen_p.h>
 #endif
 
@@ -46,7 +49,64 @@ WebOSCursor::~WebOSCursor()
 
 void WebOSCursor::changeCursor(QCursor *cursor, QWindow *window)
 {
-    Q_UNUSED(window)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    const Qt::CursorShape newShape = cursor ? cursor->shape() : Qt::ArrowCursor;
+
+    // Cursor shapes below need webOS specific handling with revserved hotspots.
+    //   1) ArrowCursor: hotspot of 255
+    //   2) BlankCursor: hotspot of 254
+    // For other shapes, use the method of the base class.
+
+    // NOTE:
+    // To prevent QWaylandWindow::restoreMouseCursor reverts the cursor shape,
+    // we have to call QWindow::setCursor in this method. Since it is supposed
+    // to call QPlatformCursor::changeCursor again, it is important to make
+    // the control flow go to QWaylandCursor::changeCursor in the end.
+
+    int hs = 0;
+    switch (newShape) {
+    case Qt::ArrowCursor:
+        hs = 255;
+        break;
+    case Qt::BlankCursor:
+        hs = 254;
+        break;
+    default:
+        QCursor *cp = QGuiApplication::overrideCursor();
+        if (cp && cp != cursor) {
+            qWarning() << "setting cursor with overrideCursor" << cp->shape();
+            // Update window's cursor as otherwise it will be
+            // reverted by QWaylandWindow::restoreMouseCursor().
+            // It is important to check if cp != cursor to prevent
+            // recursive calls.
+            window->setCursor(*cp);
+            return;
+        } else {
+            qDebug() << "setting cursor" << newShape;
+            cp = cursor;
+        }
+        QWaylandCursor::changeCursor(cp, window);
+        return;
+    }
+
+    // Continue webOS specific cursor handling.
+    // As only hotspot matters in this case, use a bitmap cursor with dummy content.
+    QPixmap cpix = QPixmap(255, 255);
+    cpix.fill(Qt::transparent);
+    QCursor newCursor = QCursor(cpix, hs, hs);
+
+    qDebug() << "webOS specific cursor handling for:" << newShape;
+
+    // Apply newCursor to all input devices.
+    for (auto *inputDevice : mDisplay->inputDevices())
+        inputDevice->setCursor(&newCursor);
+    // Update window's cursor as otherwise it will be
+    // reverted by QWaylandWindow::restoreMouseCursor().
+    // Calling setCursor with a bitmap cursor will lead the control
+    // to QWaylandCursor::changeCursor.
+    window->setCursor(newCursor);
+#else
+    Q_UNUSED(window);
 
     const Qt::CursorShape newShape = cursor ? cursor->shape() : Qt::ArrowCursor;
 
@@ -58,11 +118,7 @@ void WebOSCursor::changeCursor(QCursor *cursor, QWindow *window)
         return;
     }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    struct wl_cursor_image *image = nullptr;
-#else
     struct wl_cursor_image *image = mCursorTheme->cursorImage(newShape);
-#endif
 
     if (image == nullptr) {
         qWarning() << "Could not get cursor";
@@ -89,11 +145,11 @@ void WebOSCursor::changeCursor(QCursor *cursor, QWindow *window)
         return;
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     mDisplay->setCursor(buffer, image, 1.0);
 #endif
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void WebOSCursor::createBitmapCursor(QPixmap cursorPixmap, QPoint hotSpot)
 {
     if (mCustomCursorBuffer != NULL) {
@@ -111,7 +167,6 @@ void WebOSCursor::createBitmapCursor(QPixmap cursorPixmap, QPoint hotSpot)
     struct wl_cursor_image customCursorImage = {cursorPixmap.width(), cursorPixmap.height(),
                                                 hotSpot.x(), hotSpot.y(), 0};
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     mDisplay->setCursor(mCustomCursorBuffer->buffer(), &customCursorImage, 1.0);
-#endif
 }
+#endif

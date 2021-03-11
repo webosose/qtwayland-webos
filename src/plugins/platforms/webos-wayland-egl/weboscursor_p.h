@@ -38,10 +38,16 @@ public:
     WebOSCursor(QWaylandScreen *screen);
 #endif
     ~WebOSCursor();
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void changeCursor(QCursor *cursor, QWindow *window) override;
+#else
 private:
     void changeCursor(QCursor *cursor, QWindow *window);
     void createBitmapCursor(QPixmap cursorPixmap, QPoint hotSpot);
+#endif
 
+private:
     QWaylandShmBuffer *mCustomCursorBuffer;
 };
 

@@ -209,7 +209,6 @@ void WebOSPlatformWindow::handleMouseLeave(QWaylandInputDevice *inputDevice)
         QWindowSystemInterface::handleLeaveEvent(window());
     }
 }
-#endif
 
 void WebOSPlatformWindow::restoreMouseCursor(QWaylandInputDevice *device)
 {
@@ -223,10 +222,9 @@ void WebOSPlatformWindow::restoreMouseCursor(QWaylandInputDevice *device)
 
     //Do not use qt's setCursor here. Cause App's window cursor haven't chagned,
     //it will not affect current cursor shape, that is same shape.
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     waylandScreen()->waylandCursor()->changeCursor(cp, window());
-#endif
 }
+#endif
 
 void WebOSPlatformWindow::onDevicePixelRatioChanged()
 {
