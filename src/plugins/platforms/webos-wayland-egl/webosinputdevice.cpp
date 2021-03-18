@@ -153,6 +153,23 @@ std::pair<int, QString> WebOSInputDevice::WebOSKeyboard::keysymToQtKey(xkb_keysy
 void WebOSInputDevice::WebOSKeyboard::keyboard_key(uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
 {
     PMTRACE_FUNCTION;
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto *window = Keyboard::focusWindow();
+    if (window && !window->window()->isActive()) {
+        // Due to the asynchronous window activation by the upstream commit f497a5b,
+        // the window may not yet be activated at the time when the very first key
+        // event arrives.
+        // The window activation is triggered by a wl_keyboard::enter event from
+        // the compositor and we can assume that a key event is always sent to a
+        // surface focused. Thus there is no issue with activating window earlier
+        // than the enter event is processed completely.
+        // Note that the activation done here does not affect to active window
+        // handling in QWaylandDisplay.(See QWaylandDisplay::handleWaylandSync())
+        QWindowSystemInterface::handleWindowActivated(window->window());
+    }
+#endif
+
     Keyboard::keyboard_key(serial, time, key, state);
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     //In WebOS, we don't support repeat key by qtwayland
