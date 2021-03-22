@@ -107,4 +107,16 @@ void WebOSScreen::output_done()
     }
     QWaylandScreen::output_done();
     updateDevicePixelRatio();
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    // webOS specific way to determine the screen to use:
+    // 1) DISPLAY_ID is set by the application manager meaning the display ID to use.
+    // 2) wl_output has display information in its "model" value.
+    // 3) If this wl_output has the same display_id with DISPLAY_ID, set it as the primary screen.
+    static QByteArray displayId = qgetenv("DISPLAY_ID");
+    if (displayId == QUrlQuery(mModel).queryItemValue(QLatin1String("display_id"))) {
+        qInfo() << "Set" << mOutputName << "with displayId" << displayId << "as primary screen";
+        QWindowSystemInterface::handlePrimaryScreenChanged(this);
+    }
+#endif
 }
