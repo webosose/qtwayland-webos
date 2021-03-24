@@ -57,7 +57,9 @@ public:
     WebOSKeyboard(QWaylandInputDevice *device);
 
 #if QT_CONFIG(xkbcommon)
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    int keysymToQtKey(xkb_keysym_t keysym, Qt::KeyboardModifiers modifiers, xkb_state *state, xkb_keycode_t code) override;
+#else
     std::pair<int, QString> keysymToQtKey(xkb_keysym_t keysym, Qt::KeyboardModifiers &modifiers) override;
 #endif
 #endif
