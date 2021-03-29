@@ -66,6 +66,7 @@ signals:
 protected:
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     void doHandleFrameCallback() override;
+    QRect defaultGeometry() const override;
 #endif
 
 private:

@@ -165,6 +165,11 @@ void WebOSPlatformWindow::doHandleFrameCallback()
         mSurface->commit();
     }
 }
+
+QRect WebOSPlatformWindow::defaultGeometry() const
+{
+    return QRect(0, 0, 0, 0);
+}
 #endif
 
 void WebOSPlatformWindow::setGeometry(const QRect &rect)
