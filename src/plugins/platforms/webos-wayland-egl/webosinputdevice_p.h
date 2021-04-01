@@ -65,6 +65,21 @@ public:
 #endif
 
     void keyboard_key(uint32_t serial, uint32_t time, uint32_t key, uint32_t state) override;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void keyboard_keymap(uint32_t format, int32_t fd, uint32_t size) override;
+    void keyboard_modifiers(uint32_t serial, uint32_t mods_depressed, uint32_t mods_latched, uint32_t mods_locked, uint32_t group) override;
+#if QT_CONFIG(xkbcommon)
+    int32_t mKeymapFd;
+    uint32_t mKeymapSize;
+    bool mPendingKeymap;
+    uint32_t mKeymapFormat = WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1;
+#endif
+
+private:
+#if QT_CONFIG(xkbcommon)
+    bool loadKeyMap();
+#endif
+#endif
 };
 
 class WebOSInputDevice::WebOSPointer : public QWaylandInputDevice::Pointer

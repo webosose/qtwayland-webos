@@ -34,6 +34,11 @@
 
 #if QT_CONFIG(xkbcommon)
 #include <xkbcommon/xkbcommon.h>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#endif
 #endif
 
 WebOSInputDevice::WebOSInputDevice(QWaylandDisplay *display, int version, uint32_t id)
@@ -109,6 +114,13 @@ void WebOSInputDevice::setTime(uint32_t time)
 
 WebOSInputDevice::WebOSKeyboard::WebOSKeyboard(QWaylandInputDevice *device)
     : Keyboard(device)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_CONFIG(xkbcommon)
+    , mKeymapFd(-1)
+    , mKeymapSize(0)
+    , mPendingKeymap(false)
+#endif
+#endif
 {
 
 }
@@ -437,12 +449,74 @@ void WebOSInputDevice::WebOSKeyboard::keyboard_key(uint32_t serial, uint32_t tim
     }
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_CONFIG(xkbcommon)
+    if (!loadKeyMap())
+        return;
+#endif
+#endif
+
     Keyboard::keyboard_key(serial, time, key, state);
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     //In WebOS, we don't support repeat key by qtwayland
     stopRepeat();
 #endif
 }
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void WebOSInputDevice::WebOSKeyboard::keyboard_keymap(uint32_t format, int32_t fd, uint32_t size)
+{
+    PMTRACE_FUNCTION;
+#if QT_CONFIG(xkbcommon)
+    if (format != WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1) {
+        close(fd);
+        return;
+    }
+
+    mKeymapFd = fd;
+    mKeymapSize = size;
+    mPendingKeymap = true;
+#else
+    Keyboard::keyboard_keymap(format, fd, size);
+#endif
+}
+
+void WebOSInputDevice::WebOSKeyboard::keyboard_modifiers(uint32_t serial, uint32_t mods_depressed, uint32_t mods_latched, uint32_t mods_locked, uint32_t group)
+{
+    PMTRACE_FUNCTION;
+
+#if QT_CONFIG(xkbcommon)
+    if (!loadKeyMap())
+        return;
+#endif
+
+    Keyboard::keyboard_modifiers(serial, mods_depressed, mods_latched, mods_locked, group);
+}
+
+#if QT_CONFIG(xkbcommon)
+bool WebOSInputDevice::WebOSKeyboard::loadKeyMap()
+{
+    if (!mPendingKeymap)
+        return true;
+
+    if (mKeymapFormat != WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1) {
+        qWarning() << "unknown keymap format:" << mKeymapFormat;
+        close(mKeymapFd);
+        return false;
+    }
+
+    char *map_str = static_cast<char *>(mmap(nullptr, mKeymapSize, PROT_READ, MAP_SHARED, mKeymapFd, 0));
+    if (map_str == MAP_FAILED) {
+        close(mKeymapFd);
+        return false;
+    }
+
+    Keyboard::keyboard_keymap(mKeymapFormat, mKeymapFd, mKeymapSize);
+    mPendingKeymap = false;
+    return true;
+}
+#endif
+#endif
 
 WebOSInputDevice::WebOSPointer::WebOSPointer(QWaylandInputDevice *device)
     : Pointer(device)
