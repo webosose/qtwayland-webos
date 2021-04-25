@@ -37,9 +37,6 @@ public:
     bool initialize(QWaylandDisplay *display) override;
     QWaylandShellSurface *createShellSurface(QWaylandWindow *window) override;
     QWaylandDisplay *display() { return m_display; }
-
-private:
-    static void registry_global(void *data, struct wl_registry *registry, uint32_t id, const QString &interface, uint32_t version);
 };
 
 QT_END_NAMESPACE

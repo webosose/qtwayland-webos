@@ -31,14 +31,6 @@
 #include <QDebug>
 #include <qpa/qwindowsysteminterface.h>
 
-static WebOSShellSurface *
-webOSShellSurfaceFor(QWindow *window)
-{
-    WebOSPlatform *platform = WebOSPlatform::instance();
-    WebOSShell *shell = platform ? platform->shell() : NULL;
-    return shell ? shell->shellSurfaceFor(window) : NULL;
-}
-
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 WebOSPlatformWindow::WebOSPlatformWindow(QWindow *window,  QWaylandDisplay *display)
     : QWaylandEglWindow(window, display)
@@ -58,13 +50,15 @@ WebOSPlatformWindow::WebOSPlatformWindow(QWindow *window)
         m_autoOrientation = false;
 
     WebOSShellSurfacePrivate* ssp = static_cast<WebOSShellSurfacePrivate *>(shellSurface());
-    if (ssp) {
-        WebOSShellSurface* ss = ssp->shellSurface();
-        QObject::connect(ss, &WebOSShellSurface::positionChanged, [this, ss] {
-            m_position = ss->position();
-            setGeometry(QRect(m_position.x(), m_position.y(), geometry().width(), geometry().height()));
-            emit positionChanged(m_position);
-        });
+    if (ssp && ssp->shellSurface()) {
+        // Already created
+        onShellSurfaceCreated(ssp->shellSurface(), this);
+    } else {
+        WebOSPlatform *platform = WebOSPlatform::instance();
+        if (platform && platform->shell())
+            connect(platform->shell(), &WebOSShell::shellSurfaceCreated, this, &WebOSPlatformWindow::onShellSurfaceCreated);
+        else
+            qWarning() << "Could not connect to WebOSShell::shellSurfaceCreated," << static_cast<QObject*>(this);
     }
 
     WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
@@ -122,9 +116,8 @@ void WebOSPlatformWindow::setWindowState(Qt::WindowStates state)
 {
     setWindowStateInternal(state);
 
-    WebOSShellSurface *ss = webOSShellSurfaceFor(window());
-    if (ss)
-        ss->setState(state);
+    if (m_shellSurface)
+        m_shellSurface->setState(state);
 }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -196,6 +189,19 @@ void WebOSPlatformWindow::setGeometry(const QRect &rect)
 qreal WebOSPlatformWindow::devicePixelRatio() const
 {
     return static_cast<WebOSScreen *>(waylandScreen())->devicePixelRatio();
+}
+
+void WebOSPlatformWindow::onShellSurfaceCreated(WebOSShellSurface *shellSurface, QPlatformWindow *window)
+{
+    if (shellSurface && window == this) {
+        m_shellSurface = shellSurface;
+        qInfo() << "shellSurface" << m_shellSurface << "was created for" << static_cast<QObject*>(this) << window;
+        QObject::connect(m_shellSurface, &WebOSShellSurface::positionChanged, [this] {
+            m_position = m_shellSurface->position();
+            setGeometry(QRect(m_position.x(), m_position.y(), geometry().width(), geometry().height()));
+            emit positionChanged(m_position);
+        });
+    }
 }
 
 void WebOSPlatformWindow::onOutputTransformChanged()

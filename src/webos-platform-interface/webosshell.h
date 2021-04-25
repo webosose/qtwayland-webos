@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2019 LG Electronics, Inc.
+// Copyright (c) 2013-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,12 +28,10 @@ namespace QtWaylandClient {
 }
 using QtWaylandClient::QWaylandDisplay;
 
-//TODO Fix this
-typedef uint uint32_t;
-
-class WebOSShell : public QObject {
-
+class WebOSShell : public QObject
+{
     Q_OBJECT
+    Q_DECLARE_PRIVATE(WebOSShell)
 
 public:
     ~WebOSShell();
@@ -47,10 +45,12 @@ public:
      */
      WebOSShellSurface* shellSurfaceFor(QWindow* window);
 
+signals:
+    void shellSurfaceCreated(WebOSShellSurface *shellSurface, QPlatformWindow *window);
+
 private:
     QScopedPointer<WebOSShellPrivate> d_ptr;
     Q_DISABLE_COPY(WebOSShell);
-    Q_DECLARE_PRIVATE(WebOSShell)
 
     WebOSShell(QWaylandDisplay* disp, uint32_t id);
     friend class WebOSShellIntegration;

@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 LG Electronics, Inc.
+// Copyright (c) 2015-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,9 +36,6 @@ bool WebOSShellIntegration::initialize(QWaylandDisplay *display)
 {
     m_display = display;
 
-    if (m_display)
-        m_display->addRegistryListener(WebOSShellIntegration::registry_global, this);
-
     return true;
 }
 
@@ -51,18 +48,4 @@ QWaylandShellSurface *WebOSShellIntegration::createShellSurface(QWaylandWindow *
     }
 
     return 0;
-}
-
-void WebOSShellIntegration::registry_global(void *data, struct wl_registry *registry, uint32_t id, const QString &interface, uint32_t version)
-{
-    Q_UNUSED(registry);
-    Q_UNUSED(version);
-
-    WebOSShellIntegration *integration = static_cast<WebOSShellIntegration *>(data);
-
-    if (interface == "wl_webos_shell") {
-        WebOSShell *webOSShell = new WebOSShell(integration->display(), id);
-        WebOSPlatformPrivate* p = WebOSPlatformPrivate::get(WebOSPlatform::instance());
-        p->setShell(webOSShell);
-    }
 }

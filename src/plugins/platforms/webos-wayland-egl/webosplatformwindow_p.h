@@ -33,6 +33,8 @@ using QtWaylandClient::QWaylandCursor;
 using QtWaylandClient::QWaylandEglWindow;
 using QtWaylandClient::QWaylandInputDevice;
 
+class WebOSShellSurface;
+
 class WebOSPlatformWindow : public QWaylandEglWindow
 {
     Q_OBJECT
@@ -82,11 +84,14 @@ private:
 #endif
 
 private slots:
+    void onShellSurfaceCreated(WebOSShellSurface *shellSurface, QPlatformWindow *window);
     void onOutputTransformChanged();
     void onDevicePixelRatioChanged();
     void onScreenChanged(QScreen *screen);
 
 private:
+    WebOSShellSurface *m_shellSurface = nullptr;
+
     bool m_autoOrientation;
     QRect m_initialGeometry;
 

@@ -27,6 +27,7 @@
 #include <wayland-client.h>
 #include <wayland-webos-shell-client-protocol.h>
 
+class WebOSShell;
 class WebOSShellSurface;
 class QWindow;
 
@@ -38,7 +39,9 @@ namespace QtWaylandClient {
 using QtWaylandClient::QWaylandDisplay;
 using QtWaylandClient::QWaylandShellSurface;
 
-class WebOSShellPrivate {
+class WebOSShellPrivate
+{
+    Q_DECLARE_PUBLIC(WebOSShell)
 
 public:
     WebOSShellPrivate(QWaylandDisplay* display, uint32_t id);
@@ -59,6 +62,7 @@ public:
 #endif
 
 private:
+    WebOSShell *q_ptr;
     wl_webos_shell *m_shell = nullptr;
     QtWayland::wl_shell *m_wlShell = nullptr;
     QWaylandDisplay *m_display = nullptr;
