@@ -14,6 +14,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include <QDebug>
 #include <qpa/qplatformintegrationplugin.h>
 #include "weboseglplatformintegration.h"
 
@@ -31,7 +32,14 @@ QPlatformIntegration *WebOSIntegrationPlugin::create(const QString& system, cons
 {
     Q_UNUSED(paramList);
     Q_UNUSED(system);
-    return new WebOSEglPlatformIntegration();
+    auto *integration = new WebOSEglPlatformIntegration();
+
+    if (integration->hasFailed()) {
+        qCritical() << "Failed to initialize WebOSEglPlatformIntegration, exiting";
+        ::exit(1);
+    }
+
+    return integration;
 }
 
 QT_END_NAMESPACE
