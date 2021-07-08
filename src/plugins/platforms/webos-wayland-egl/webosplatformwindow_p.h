@@ -61,6 +61,8 @@ public:
 
     qreal devicePixelRatio() const override;
 
+    void deliverUpdateRequest() override;
+
 signals:
     void resizeRequested(const QSize &oldSize, const QSize &newSize);
     void positionChanged(const QPointF &position);

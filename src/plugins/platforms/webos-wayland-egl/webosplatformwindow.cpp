@@ -30,6 +30,7 @@
 #include <QGuiApplication>
 #include <QDebug>
 #include <qpa/qwindowsysteminterface.h>
+#include <QtCore/private/qabstractanimation_p.h>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 WebOSPlatformWindow::WebOSPlatformWindow(QWindow *window,  QWaylandDisplay *display)
@@ -202,6 +203,20 @@ void WebOSPlatformWindow::onShellSurfaceCreated(WebOSShellSurface *shellSurface,
             emit positionChanged(m_position);
         });
     }
+}
+
+void WebOSPlatformWindow::deliverUpdateRequest()
+{
+    // To synchronize animation timers
+    QUnifiedTimer *ut = QUnifiedTimer::instance(false);
+    if (ut)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        ut->updateAnimationTimers();
+#else
+        ut->updateAnimationTimers(-1);
+#endif
+
+    QWaylandEglWindow::deliverUpdateRequest();
 }
 
 void WebOSPlatformWindow::onOutputTransformChanged()
