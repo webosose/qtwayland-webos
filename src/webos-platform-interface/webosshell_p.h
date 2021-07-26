@@ -23,24 +23,23 @@
 #endif
 #include <QWindow>
 #include <QtWaylandClient/private/qwayland-wayland.h>
+#include <QtWaylandClient/private/qwaylandwindow_p.h>
 
 #include <wayland-client.h>
 #include <wayland-webos-shell-client-protocol.h>
 
-class WebOSShell;
+#include "webosshell.h"
+
 class WebOSShellSurface;
 class QWindow;
 
-namespace QtWaylandClient {
-    class QWaylandShellSurface;
-    class QWaylandDisplay;
-}
-
 using QtWaylandClient::QWaylandDisplay;
 using QtWaylandClient::QWaylandShellSurface;
+using QtWaylandClient::QWaylandWindow;
 
-class WebOSShellPrivate
+class WebOSShellPrivate : public QObject
 {
+    Q_OBJECT
     Q_DECLARE_PUBLIC(WebOSShell)
 
 public:
@@ -53,9 +52,9 @@ public:
         return shell->d_func();
     }
 
-    QWaylandShellSurface* createShellSurface(QPlatformWindow* window);
+    QWaylandShellSurface* createShellSurface(QWaylandWindow* waylandWindow);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    QWaylandShellSurface* preCreateShellSurface(QPlatformWindow* window);
+    QWaylandShellSurface* preCreateShellSurface(QWaylandWindow* waylandWindow);
     void setWlShell(QtWayland::wl_shell *wlShell) { m_wlShell = wlShell; }
 
     static void registry_global(void *data, struct wl_registry *registry, uint32_t id, const QString &interface, uint32_t version);
@@ -68,7 +67,7 @@ private:
     QWaylandDisplay *m_display = nullptr;
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    QHash<QPlatformWindow *, QWaylandShellSurface *> m_preCreatedShellSurfaces;
+    QHash<QWaylandWindow *, QWaylandShellSurface *> m_preCreatedShellSurfaces;
 #endif
 };
 
