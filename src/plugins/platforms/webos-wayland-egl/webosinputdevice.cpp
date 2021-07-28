@@ -505,12 +505,6 @@ bool WebOSInputDevice::WebOSKeyboard::loadKeyMap()
         return false;
     }
 
-    char *map_str = static_cast<char *>(mmap(nullptr, mKeymapSize, PROT_READ, MAP_SHARED, mKeymapFd, 0));
-    if (map_str == MAP_FAILED) {
-        close(mKeymapFd);
-        return false;
-    }
-
     Keyboard::keyboard_keymap(mKeymapFormat, mKeymapFd, mKeymapSize);
     mPendingKeymap = false;
     return true;
