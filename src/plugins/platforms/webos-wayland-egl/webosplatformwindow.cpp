@@ -124,11 +124,9 @@ void WebOSPlatformWindow::setWindowState(Qt::WindowStates state)
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void WebOSPlatformWindow::setVisible(bool visible)
 {
-    static bool initialize = true;
-
-    if (initialize && visible) {
+    if (!m_initialized && visible) {
         // Call setVisible once since QWaylandWindow::setVisible(false) was ignored.
-        initialize = false;
+        m_initialized = true;
         QWaylandWindow::setVisible(visible);
     } else if (visible) {
         mDisplay->flushRequests();
