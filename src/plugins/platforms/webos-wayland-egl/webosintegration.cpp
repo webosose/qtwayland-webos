@@ -63,7 +63,9 @@ QPlatformWindow *WebOSIntegration::createPlatformWindow(QWindow *window) const
     // Note that abort() doesn't work properly as well for some reason,
     // thus we call ::exit() instead to terminate the process gracefully.
 
-    if ((window->surfaceType() != QWindow::OpenGLSurface && window->surfaceType() != QWindow::RasterGLSurface)) {
+    if ((window->surfaceType() != QWindow::OpenGLSurface &&
+         window->surfaceType() != QWindow::RasterGLSurface &&
+         window->surfaceType() != QWindow::VulkanSurface)) {
         qCritical("Unsupported surfaceType(%d), exiting.", window->surfaceType());
         ::exit(1);
     }
