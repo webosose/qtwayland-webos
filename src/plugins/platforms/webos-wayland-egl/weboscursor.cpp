@@ -118,34 +118,31 @@ void WebOSCursor::changeCursor(QCursor *cursor, QWindow *window)
         return;
     }
 
-    struct wl_cursor_image *image = mCursorTheme->cursorImage(newShape);
-
-    if (image == nullptr) {
-        qWarning() << "Could not get cursor";
-        return;
-    }
-
     // webOS specific cursor handling with reserved hotspot values
     // 1) 255: ArrowCursor
     // 2) 254: BlankCursor
-    if (newShape == Qt::ArrowCursor) {
-        image->hotspot_x = 255;
-        image->hotspot_y = 255;
-    } else if (newShape == Qt::BlankCursor) {
-        image->hotspot_x = 254;
-        image->hotspot_y = 254;
-    } else {
-        // TODO
+    switch (newShape) {
+    case Qt::ArrowCursor:
+    case Qt::BlankCursor: {
+        QPixmap cPix = QPixmap(255, 255);
+        cPix.fill(Qt::transparent);
+        createBitmapCursor(cPix, newShape == Qt::ArrowCursor ? QPoint(255,255) : QPoint(254,254));
+        break;
     }
-
-    struct wl_buffer *buffer = wl_cursor_image_get_buffer(image);
-
-    if (!buffer) {
-        qWarning("Could not find buffer for cursor");
-        return;
+    default:
+        struct wl_cursor_image *image = mCursorTheme->cursorImage(newShape);
+        if (image == nullptr) {
+            qWarning() << "Could not get cursor";
+            return;
+        }
+        struct wl_buffer *buffer = wl_cursor_image_get_buffer(image);
+        if (!buffer) {
+            qWarning("Could not find buffer for cursor");
+            return;
+        }
+        mDisplay->setCursor(buffer, image, 1.0);
+        break;
     }
-
-    mDisplay->setCursor(buffer, image, 1.0);
 #endif
 }
 
