@@ -578,6 +578,9 @@ void WebOSInputDevice::WebOSPointer::pointer_leave(uint32_t time, struct wl_surf
 {
     PMTRACE_FUNCTION;
 
+    if (!surface)
+        return;
+
     WebOSInputDevice *parent = static_cast<WebOSInputDevice*>(mParent);
     WebOSPlatformWindow *ww = static_cast<WebOSPlatformWindow *>(QWaylandWindow::fromWlSurface(surface));
     if (ww)
