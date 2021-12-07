@@ -21,6 +21,7 @@
 #include <webosshell.h>
 #include <webosshellsurface.h>
 #include <webosshellsurface_p.h>
+#include <webospresentationtime.h>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QtWaylandClient/private/qwaylandsurface_p.h>
@@ -205,6 +206,8 @@ void WebOSPlatformWindow::onShellSurfaceCreated(WebOSShellSurface *shellSurface,
 
 void WebOSPlatformWindow::deliverUpdateRequest()
 {
+    static bool enablePresentationTime = (qEnvironmentVariableIntValue("WEBOS_PRESENTATION_TIME") == 1);
+
     // To synchronize animation timers
     QUnifiedTimer *ut = QUnifiedTimer::instance(false);
     if (ut)
@@ -215,6 +218,13 @@ void WebOSPlatformWindow::deliverUpdateRequest()
 #endif
 
     QWaylandEglWindow::deliverUpdateRequest();
+
+    if (enablePresentationTime) {
+        WebOSPlatform *platform = WebOSPlatform::instance();
+        WebOSPresentationTime *presentation = platform ? platform->presentation() : nullptr;
+        if (presentation)
+            presentation->requestFeedback(this);
+    }
 }
 
 void WebOSPlatformWindow::onOutputTransformChanged()

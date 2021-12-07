@@ -31,6 +31,7 @@ WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-webos/webos-input-ma
 WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-webos/webos-extension.xml
 WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-webos/webos-foreign.xml
 WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-webos/webos-tablet.xml
+WAYLANDCLIENTSOURCES += $$[QT_INSTALL_PREFIX]/share/wayland-protocols/stable/presentation-time/presentation-time.xml
 
 SOURCES += \
     webosshellintegration.cpp \
@@ -44,7 +45,8 @@ SOURCES += \
     webosinputmanager.cpp \
     webosinputpanellocator.cpp \
     webosforeign.cpp \
-    webostablet.cpp
+    webostablet.cpp \
+    webospresentationtime.cpp
 
 PUBLICHEADERS = \
     webosplatform.h \
@@ -58,7 +60,8 @@ PUBLICHEADERS = \
     webosshellintegration.h \
     webosinputpanellocator.h \
     webosforeign.h \
-    webostablet.h
+    webostablet.h \
+    webospresentationtime.h
 
 HEADERS += \
     $$PUBLICHEADERS \
@@ -71,7 +74,8 @@ HEADERS += \
     webosinputmanager_p.h \
     webosinputpanellocator_p.h \
     webosforeign_p.h \
-    webostablet_p.h
+    webostablet_p.h \
+    webospresentationtime_p.h
 
 criu {
     DEFINES += HAS_CRIU

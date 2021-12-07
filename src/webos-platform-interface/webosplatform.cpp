@@ -22,6 +22,7 @@
 #include "webosinputpanellocator.h"
 #include "webosforeign.h"
 #include "webostablet.h"
+#include "webospresentationtime.h"
 
 #include <QDebug>
 #include <QtGui/private/qguiapplication_p.h>
@@ -73,6 +74,8 @@ void WebOSPlatformPrivate::registry_global(void *data, struct wl_registry *regis
             qInfo() << "Binding wl_webos_tablet as WEBOS_TABLET is set to" << webos_tablet;
             p->m_webosTablet = new WebOSTablet(p->display(), id);
         }
+    } else if (interface == "wp_presentation") {
+        p->mPresentation = new WebOSPresentationTime(p->display(), id);
     }
 }
 
@@ -141,6 +144,12 @@ WebOSTablet* WebOSPlatform::webOSTablet()
 {
     Q_D(WebOSPlatform);
     return d->m_webosTablet;
+}
+
+WebOSPresentationTime* WebOSPlatform::presentation()
+{
+    Q_D(WebOSPlatform);
+    return d->presentation();
 }
 
 #ifdef HAS_CRIU

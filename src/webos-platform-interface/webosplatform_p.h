@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2019 LG Electronics, Inc.
+// Copyright (c) 2013-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ class WebOSTablet;
 #ifdef HAS_CRIU
 class AppSnapshotManager;
 #endif
+class WebOSPresentationTime;
 
 using QtWaylandClient::QWaylandDisplay;
 using QtWaylandClient::QWaylandIntegration;
@@ -42,6 +43,7 @@ public:
     }
     void setShell(WebOSShell* shell);
     QWaylandDisplay *display() { return m_display; }
+    WebOSPresentationTime *presentation() const { return mPresentation; }
 
     static void registry_global(void *data, struct wl_registry *registry, uint32_t id, const QString &interface, uint32_t version);
 
@@ -54,6 +56,7 @@ public:
 #ifdef HAS_CRIU
     AppSnapshotManager* m_appSnapshotManager;
 #endif
+    WebOSPresentationTime *mPresentation = nullptr;
 };
 
 #endif
