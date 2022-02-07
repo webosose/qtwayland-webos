@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2021 LG Electronics, Inc.
+// Copyright (c) 2015-2022 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,8 +47,8 @@ public:
 #else
     QWaylandCursor *createPlatformCursor(QWaylandScreen *screen) const override;
     QWaylandInputDevice *createInputDevice(QWaylandDisplay *display, int version, uint32_t id) override;
-    void initialize() override;
 #endif
+    void initialize() override;
 
 #ifdef HAS_CRIU
     void resetInputContext();
@@ -56,6 +56,8 @@ public:
 
     QVariant styleHint(StyleHint hint) const override;
     bool hasCapability(QPlatformIntegration::Capability cap) const override;
+
+    void ensureDisplayScreen();
 };
 
 #endif

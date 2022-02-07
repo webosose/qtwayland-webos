@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2021 LG Electronics, Inc.
+// Copyright (c) 2015-2022 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -125,9 +125,13 @@ QWaylandNativeInterface *WebOSIntegration::createPlatformNativeInterface()
 }
 #endif
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void WebOSIntegration::initialize()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QWaylandIntegration::initialize();
+
+    ensureDisplayScreen();
+#else
     // TODO
     // Consider creating WaylandInputContext directly like other platform
     // features rather than creating it via QPlatformInputContextFactory.
@@ -137,8 +141,8 @@ void WebOSIntegration::initialize()
     mInputContext.reset(QPlatformInputContextFactory::create());
 
     QWaylandIntegration::initialize();
-}
 #endif
+}
 
 #ifdef HAS_CRIU
 void WebOSIntegration::resetInputContext()
@@ -164,5 +168,21 @@ bool WebOSIntegration::hasCapability(QPlatformIntegration::Capability cap) const
     case NonFullScreenWindows:
         return false;
     default: return QWaylandIntegration::hasCapability(cap);
+    }
+}
+
+void WebOSIntegration::ensureDisplayScreen()
+{
+    QWaylandDisplay *waylandDisplay = display();
+
+    // Wait until display has appropriate screen if it has a fake one.
+    // The fake screen will be deleted when suitable screen is added on the display.
+    // See QWaylandDisplay::handleScreenInitialized.
+    while (waylandDisplay->placeholderScreen()) {
+        qWarning() << "Display has a fake screen. Process events on display to have a suitable screen.";
+
+        // Similar as QWaylandDisplay::initialize.
+        // However just forceRoundTrip on display since mWaitingScreens is private in QWaylandDisplay.
+        waylandDisplay->forceRoundTrip();
     }
 }
