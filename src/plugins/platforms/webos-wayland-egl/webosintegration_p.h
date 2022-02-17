@@ -44,10 +44,13 @@ public:
     QWaylandCursor *createPlatformCursor(QWaylandDisplay *display) const override;
     QWaylandInputDevice *createInputDevice(QWaylandDisplay *display, int version, uint32_t id) const override;
     QWaylandNativeInterface *createPlatformNativeInterface() override;
+
+    void ensureDisplayScreen();
 #else
     QWaylandCursor *createPlatformCursor(QWaylandScreen *screen) const override;
     QWaylandInputDevice *createInputDevice(QWaylandDisplay *display, int version, uint32_t id) override;
 #endif
+
     void initialize() override;
 
 #ifdef HAS_CRIU
@@ -56,8 +59,6 @@ public:
 
     QVariant styleHint(StyleHint hint) const override;
     bool hasCapability(QPlatformIntegration::Capability cap) const override;
-
-    void ensureDisplayScreen();
 };
 
 #endif

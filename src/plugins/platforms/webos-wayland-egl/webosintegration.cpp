@@ -171,6 +171,7 @@ bool WebOSIntegration::hasCapability(QPlatformIntegration::Capability cap) const
     }
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void WebOSIntegration::ensureDisplayScreen()
 {
     QWaylandDisplay *waylandDisplay = display();
@@ -186,3 +187,4 @@ void WebOSIntegration::ensureDisplayScreen()
         waylandDisplay->forceRoundTrip();
     }
 }
+#endif
