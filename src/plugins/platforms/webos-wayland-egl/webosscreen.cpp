@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2021 LG Electronics, Inc.
+// Copyright (c) 2015-2022 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ void WebOSScreen::updateDevicePixelRatio()
         qInfo() << "Use default devicePixelRatio" << ratio;
     }
 
-    if (mDevicePixelRatio != ratio) {
+    if (!qFuzzyCompare(mDevicePixelRatio, ratio)) {
         mDevicePixelRatio = ratio;
         qInfo() << "Set devicePixelRatio to" << mDevicePixelRatio;
         emit devicePixelRatioChanged();
