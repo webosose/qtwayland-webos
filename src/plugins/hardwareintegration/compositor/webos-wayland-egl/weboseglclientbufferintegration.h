@@ -22,9 +22,17 @@
 #include <QtWaylandCompositor/private/waylandeglclientbufferintegration.h>
 #endif
 
+#if !defined(WEBOS_WAYLANDCOMPOSITOR_EXPORT)
+#  if defined(QT_SHARED)
+#    define WEBOS_WAYLANDCOMPOSITOR_EXPORT Q_DECL_EXPORT
+#  else
+#    define WEBOS_WAYLANDCOMPOSITOR_EXPORT
+#  endif
+#endif
+
 class WebOSEglClientBufferIntegration;
 
-class Q_WAYLAND_COMPOSITOR_EXPORT WebOSEglClientBuffer : public WaylandEglClientBuffer
+class WEBOS_WAYLANDCOMPOSITOR_EXPORT WebOSEglClientBuffer : public WaylandEglClientBuffer
 {
 public:
     WebOSEglClientBuffer(WebOSEglClientBufferIntegration* integration, wl_resource *bufferResource);
@@ -33,7 +41,7 @@ private:
     WebOSEglClientBufferIntegration *m_webosIntegration = nullptr;
 };
 
-class Q_WAYLAND_COMPOSITOR_EXPORT WebOSEglClientBufferIntegration : public WaylandEglClientBufferIntegration
+class WEBOS_WAYLANDCOMPOSITOR_EXPORT WebOSEglClientBufferIntegration : public WaylandEglClientBufferIntegration
 {
 public:
     WebOSEglClientBufferIntegration();
