@@ -84,7 +84,7 @@ void WebOSPresentationTime::requestFeedback(QWaylandWindow *window)
 static int
 timespec_diff_to_usec(const struct timespec *a, const struct timespec *b)
 {
-    time_t secs = a->tv_sec - b->tv_sec;
+    long secs = a->tv_sec - b->tv_sec;
     long nsec = a->tv_nsec - b->tv_nsec;
 
     return secs * 1000000 + nsec / 1000;
