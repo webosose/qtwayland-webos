@@ -142,6 +142,11 @@ void WebOSIntegration::initialize()
     mInputContext.reset(QPlatformInputContextFactory::create());
 
     QWaylandIntegration::initialize();
+
+    while(display()->screens().empty()) {
+        qWarning("Display has no screens. Process events on display to have a suitable screen.");
+        display()->forceRoundTrip();
+    }
 #endif
 }
 
