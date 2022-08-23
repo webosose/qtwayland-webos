@@ -133,6 +133,11 @@ void WebOSIntegration::initialize()
 
     ensureDisplayScreen();
 #else
+    static bool inInitialize = false;
+    if (inInitialize)
+        return;
+    inInitialize = true;
+
     // TODO
     // Consider creating WaylandInputContext directly like other platform
     // features rather than creating it via QPlatformInputContextFactory.
@@ -147,6 +152,7 @@ void WebOSIntegration::initialize()
         qWarning("Display has no screens. Process events on display to have a suitable screen.");
         display()->forceRoundTrip();
     }
+    inInitialize = false;
 #endif
 }
 
