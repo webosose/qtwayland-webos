@@ -69,6 +69,11 @@ public:
     }
 #endif
 
+    virtual ~WebOSEglPlatformIntegration()
+    {
+        delete m_client_buffer_integration;
+    }
+
     QWaylandEglClientBufferIntegration *clientBufferIntegration() const
     { return m_client_buffer_integration; }
 
