@@ -65,6 +65,8 @@ WebOSSurfaceGroupCompositor::~WebOSSurfaceGroupCompositor()
 WebOSSurfaceGroup* WebOSSurfaceGroupCompositor::createGroup(QWindow* window, const QString &name)
 {
     Q_D(WebOSSurfaceGroupCompositor);
+    if (!window || !window->handle())
+        return NULL;
     return d->createGroup(static_cast<QWaylandWindow*>(window->handle()), name);
 }
 

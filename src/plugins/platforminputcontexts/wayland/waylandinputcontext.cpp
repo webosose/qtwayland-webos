@@ -388,6 +388,10 @@ void WaylandInputContext::showInputPanel()
     if (!m_modelActivated) {
         if (!m_isActivationPending) {
             QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
+            if (!nativeInterface) {
+                qWarning() << "No nativeInterface available";
+                return;
+            }
             wl_surface* surface = (wl_surface*) nativeInterface->nativeResourceForWindow("surface", QGuiApplication::focusWindow());
             if (!surface) {
                 qWarning() << "Surface for focus window is already destroyed.";

@@ -50,11 +50,15 @@ WebOSExported* WebOSForeignPrivate::export_element(QWindow* window, WebOSForeign
     }
 
     QWaylandWindow* qww = static_cast<QWaylandWindow*>(window->handle());
+    if (!qww)
+        return NULL;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     struct ::wl_webos_exported* wlExported = QtWayland::wl_webos_foreign::export_element(qww->wlSurface(), exportedType);
 #else
     struct ::wl_webos_exported* wlExported = QtWayland::wl_webos_foreign::export_element(qww->object(), exportedType);
 #endif
+    if (!wlExported)
+        return NULL;
     WebOSExported* exported = new WebOSExported(window);
     WebOSExportedPrivate* exported_p = WebOSExportedPrivate::get(exported);
     exported_p->init(wlExported);
@@ -136,6 +140,8 @@ void WebOSExportedPrivate::setExportedWindow(const QRegion &sourceRegion, const 
     m_destinationRegion = destinationRegion;
 
     QPlatformNativeInterface *wliface = QGuiApplication::platformNativeInterface();
+    if (!wliface)
+        return;
     wl_compositor *wlcompositor = static_cast<wl_compositor *>(wliface->nativeResourceForIntegration("compositor"));
     qreal dpr = m_window->devicePixelRatio();
 
@@ -165,6 +171,8 @@ void WebOSExportedPrivate::setCropRegion(const QRegion &originalInputRegion, con
     m_destinationRegion = destinationRegion;
 
     QPlatformNativeInterface *wliface = QGuiApplication::platformNativeInterface();
+    if (!wliface)
+        return;
     wl_compositor *wlcompositor = static_cast<wl_compositor *>(wliface->nativeResourceForIntegration("compositor"));
     qreal dpr = m_window->devicePixelRatio();
 
@@ -338,7 +346,8 @@ void WebOSImported::requestPunchThrough(const QString& contextId)
 void WebOSImported::attachSurface(QWindow* surface)
 {
     Q_D(WebOSImported);
-    d->attachSurface(static_cast<QWaylandWindow*>(surface->handle()));
+    if (surface && surface->handle())
+        d->attachSurface(static_cast<QWaylandWindow*>(surface->handle()));
 }
 
 void WebOSImported::destroy()

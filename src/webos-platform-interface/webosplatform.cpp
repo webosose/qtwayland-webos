@@ -165,7 +165,7 @@ WebOSPresentationTime* WebOSPlatform::presentation()
 AppSnapshotManager* WebOSPlatform::appSnapshotManager()
 {
     Q_D(WebOSPlatform);
-    if (!d->m_appSnapshotManager) {
+    if (!d->m_appSnapshotManager && QGuiApplication::platformNativeInterface()) {
         d->m_appSnapshotManager =
             static_cast<AppSnapshotManager*>(QGuiApplication::platformNativeInterface()->nativeResourceForIntegration(QByteArrayLiteral("appsnapshotmanager")));
 

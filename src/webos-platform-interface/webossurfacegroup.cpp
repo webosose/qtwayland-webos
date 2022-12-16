@@ -68,10 +68,11 @@ void WebOSSurfaceGroupPrivate::webos_surface_group_owner_destroyed()
 
     QMutableListIterator<QPointer<QWaylandWindow> > s(m_attachedSurfaces);
     while (s.hasNext()) {
+        if (s.next().data())
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        detach(s.next().data()->wlSurface());
+            detach(s.next().data()->wlSurface());
 #else
-        detach(s.next().data()->object());
+            detach(s.next().data()->object());
 #endif
         s.remove();
     }
@@ -139,7 +140,8 @@ void WebOSSurfaceGroup::setAllowAnonymousLayers(bool allow)
 void WebOSSurfaceGroup::attachAnonymousSurface(QWindow* surface, ZHint hint)
 {
     Q_D(WebOSSurfaceGroup);
-    d->attachAnonymousSurface(static_cast<QWaylandWindow*>(surface->handle()), hint);
+    if (surface->handle())
+        d->attachAnonymousSurface(static_cast<QWaylandWindow*>(surface->handle()), hint);
 }
 
 WebOSSurfaceGroupLayer* WebOSSurfaceGroup::createNamedLayer(const QString& name, int z)
@@ -151,13 +153,15 @@ WebOSSurfaceGroupLayer* WebOSSurfaceGroup::createNamedLayer(const QString& name,
 void WebOSSurfaceGroup::attachSurface(QWindow* surface, const QString& layer)
 {
     Q_D(WebOSSurfaceGroup);
-    d->attachSurface(static_cast<QWaylandWindow*>(surface->handle()), layer);
+    if (surface->handle())
+        d->attachSurface(static_cast<QWaylandWindow*>(surface->handle()), layer);
 }
 
 void WebOSSurfaceGroup::detachSurface(QWindow* surface)
 {
     Q_D(WebOSSurfaceGroup);
-    d->detachSurface(static_cast<QWaylandWindow*>(surface->handle()));
+    if (surface->handle())
+        d->detachSurface(static_cast<QWaylandWindow*>(surface->handle()));
 }
 
 void WebOSSurfaceGroup::focusOwner()

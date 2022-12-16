@@ -285,6 +285,8 @@ void WebOSShellSurfacePrivate::sendProperty(const QString &name, const QVariant 
 void WebOSShellSurfacePrivate::setInputRegion(const QRegion& region)
 {
     QPlatformNativeInterface *wliface = QGuiApplication::platformNativeInterface();
+    if (!wliface)
+        return;
     wl_compositor *wlcompositor = static_cast<wl_compositor *>(wliface->nativeResourceForIntegration("compositor"));
     wl_region *wlregion = wl_compositor_create_region(wlcompositor);
     qreal dpr = m_parent->window()->devicePixelRatio();
