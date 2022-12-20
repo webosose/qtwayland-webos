@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2023 LG Electronics, Inc.
+# Copyright (c) 2023 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-TEMPLATE = subdirs
-CONFIG += ordered
-
-SUBDIRS += \
-    webos-wayland-egl-support \
-    webos-wayland-egl-plugin
+add_subdirectory(hardwareintegration)
+add_subdirectory(platforms)
+add_subdirectory(platforminputcontexts)
+add_subdirectory(wayland-shell-integration)

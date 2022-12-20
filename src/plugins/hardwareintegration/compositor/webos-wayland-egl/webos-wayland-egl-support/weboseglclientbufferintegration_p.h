@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2022 LG Electronics, Inc.
+// Copyright (c) 2020-2023 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #include <QtCore/qglobal.h>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-#include <QtWaylandEglCompositorHwIntegration/private/waylandeglclientbufferintegration_p.h>
+#include <private/waylandeglclientbufferintegration_p.h>
 #else
 #include <QtWaylandCompositor/private/waylandeglclientbufferintegration.h>
 #endif

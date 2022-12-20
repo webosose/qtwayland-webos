@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=/usr/lib
+includedir=${prefix}/include
+
+
+Name: webos-platform-interface
+Description: The native Qt interface for webos clients
+Version: 1.0.0
+Libs: -L${libdir} -lwebos-platform-interface
+Cflags:

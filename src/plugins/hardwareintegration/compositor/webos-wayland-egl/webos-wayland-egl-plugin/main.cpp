@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 LG Electronics, Inc.
+// Copyright (c) 2020-2023 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 #include <QtWaylandCompositor/private/qwlclientbufferintegrationfactory_p.h>
 #include <QtWaylandCompositor/private/qwlclientbufferintegrationplugin_p.h>
-#include "weboseglclientbufferintegration.h"
+#include "../webos-wayland-egl-support/weboseglclientbufferintegration_p.h"
 
 QT_BEGIN_NAMESPACE
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2023 LG Electronics, Inc.
+# Copyright (c) 2021-2023 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,20 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-TEMPLATE = subdirs
-CONFIG += ordered
+TARGET = WebOSEglClientBuffer
+MODULE = webos_egl_clientbuffer
+load(qt_module)
 
-SUBDIRS += \
-    webos-wayland-egl-support \
-    webos-wayland-egl-plugin
+QT = waylandcompositor waylandcompositor-private core-private gui-private
+
+versionAtLeast(QT_VERSION, 6.0.0) {
+    QT += wayland_egl_compositor_hw_integration-private
+} else {
+    LIBS += -lQt5WaylandEglClientBufferIntegration
+}
+
+SOURCES += \
+    weboseglclientbufferintegration.cpp
+
+HEADERS += \
+    weboseglclientbufferintegration_p.h

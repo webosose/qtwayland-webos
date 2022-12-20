@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2023 LG Electronics, Inc.
+# Copyright (c) 2023 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,24 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-TEMPLATE = subdirs
-CONFIG += ordered
+cmake_minimum_required(VERSION 3.16)
 
-SUBDIRS += \
-    webos-wayland-egl-support \
-    webos-wayland-egl-plugin
+include(.cmake.conf)
+project(wayland-webos
+    VERSION "${QT_REPO_MODULE_VERSION}"
+    DESCRIPTION "Qt wayland-webos Libraries"
+    HOMEPAGE_URL "https://github.com/webosose/qtwayland-webos"
+    LANGUAGES CXX C
+)
+
+find_package(Qt6 REQUIRED COMPONENTS
+    BuildInternals
+    Core
+    Gui
+    WaylandClient
+    WaylandCompositor
+)
+
+find_package(CRIU)
+
+qt_build_repo()

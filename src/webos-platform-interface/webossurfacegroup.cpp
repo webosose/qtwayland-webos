@@ -66,19 +66,16 @@ void WebOSSurfaceGroupPrivate::webos_surface_group_owner_destroyed()
     Q_Q(WebOSSurfaceGroup);
     emit q->ownerDestroyed();
 
-    QMutableListIterator<QPointer<QWaylandWindow> > s(m_attachedSurfaces);
-    while (s.hasNext()) {
-        if (s.next().data())
+    while (m_attachedSurfaces.length() > 0) {
+        const QPointer<QWaylandWindow>& item = m_attachedSurfaces.front();
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-            detach(s.next().data()->wlSurface());
+        detach(item->wlSurface());
 #else
-            detach(s.next().data()->object());
+        detach(item->object());
 #endif
-        s.remove();
+        m_attachedSurfaces.pop_front();
     }
-
 }
-
 
 void WebOSSurfaceGroupPrivate::attachSurface(QWaylandWindow* surface, const QString& layer)
 {
