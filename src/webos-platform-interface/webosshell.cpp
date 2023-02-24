@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2021 LG Electronics, Inc.
+// Copyright (c) 2013-2023 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -145,11 +145,12 @@ WebOSShellSurface* WebOSShell::shellSurfaceFor(QWindow* window)
         return nullptr;
 
     QWaylandWindow* qww = static_cast<QWaylandWindow*>(window->handle());
-    ssp = static_cast<WebOSShellSurfacePrivate *>(qww->shellSurface());
+    if (qww)
+        ssp = static_cast<WebOSShellSurfacePrivate *>(qww->shellSurface());
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     if (!ssp)
-       ssp =  static_cast<WebOSShellSurfacePrivate *>(d->preCreateShellSurface(qww));
+        ssp = static_cast<WebOSShellSurfacePrivate *>(d->preCreateShellSurface(qww));
 #endif
 
     return ssp ? ssp->shellSurface() : NULL;

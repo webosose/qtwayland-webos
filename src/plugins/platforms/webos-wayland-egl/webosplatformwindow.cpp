@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2022 LG Electronics, Inc.
+// Copyright (c) 2015-2023 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,10 +64,12 @@ WebOSPlatformWindow::WebOSPlatformWindow(QWindow *window)
     }
 
     WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
-    qInfo() << "Screen set to output" << screen->outputId() << screen->name() << screen->geometry();
-    QObject::connect(screen, &WebOSScreen::outputTransformChanged, this, &WebOSPlatformWindow::onOutputTransformChanged);
-    QObject::connect(screen, &WebOSScreen::devicePixelRatioChanged, this, &WebOSPlatformWindow::onDevicePixelRatioChanged);
-    QObject::connect(window, &QWindow::screenChanged, this, &WebOSPlatformWindow::onScreenChanged);
+    if (screen) {
+        qInfo() << "Screen set to output" << screen->outputId() << screen->name() << screen->geometry();
+        QObject::connect(screen, &WebOSScreen::outputTransformChanged, this, &WebOSPlatformWindow::onOutputTransformChanged);
+        QObject::connect(screen, &WebOSScreen::devicePixelRatioChanged, this, &WebOSPlatformWindow::onDevicePixelRatioChanged);
+        QObject::connect(window, &QWindow::screenChanged, this, &WebOSPlatformWindow::onScreenChanged);
+    }
 }
 
 #if (QT_VERSION < QT_VERSION_CHECK(5,10,0))
@@ -181,14 +183,17 @@ void WebOSPlatformWindow::setGeometry(const QRect &rect)
     // Handle transform for initial geometry
     if (initialize) {
         WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
-        if (WebOSScreen::compareOutputTransform(0, screen->currentTransform()))
+        if (screen && WebOSScreen::compareOutputTransform(0, screen->currentTransform()))
             onOutputTransformChanged();
     }
 }
 
 qreal WebOSPlatformWindow::devicePixelRatio() const
 {
-    return static_cast<WebOSScreen *>(waylandScreen())->devicePixelRatio();
+    if (waylandScreen())
+        return static_cast<WebOSScreen *>(waylandScreen())->devicePixelRatio();
+    else
+        return 1.0;
 }
 
 void WebOSPlatformWindow::onShellSurfaceCreated(WebOSShellSurface *shellSurface, QPlatformWindow *window)
@@ -231,6 +236,8 @@ void WebOSPlatformWindow::onOutputTransformChanged()
 {
     if (m_autoOrientation) {
         WebOSScreen *screen = static_cast<WebOSScreen *>(waylandScreen());
+        if (!screen)
+            return;
         bool isOutputPortrait = screen->geometry().height() > screen->geometry().width();
         bool isWindowPortrait = geometry().height() > geometry().width();
 
@@ -284,7 +291,8 @@ void WebOSPlatformWindow::onDevicePixelRatioChanged()
 void WebOSPlatformWindow::onScreenChanged(QScreen *screen)
 {
     Q_UNUSED(screen);
-    qInfo() << "Screen changed to output" << waylandScreen()->outputId() << waylandScreen()->name() << waylandScreen()->geometry();
+    if (waylandScreen())
+        qInfo() << "Screen changed to output" << waylandScreen()->outputId() << waylandScreen()->name() << waylandScreen()->geometry();
     onOutputTransformChanged();
     updateSurface(false);
 }
