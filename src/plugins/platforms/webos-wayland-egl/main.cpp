@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2021 LG Electronics, Inc.
+// Copyright (c) 2015-2023 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,11 @@ QPlatformIntegration *WebOSIntegrationPlugin::create(const QString& system, cons
     Q_UNUSED(system);
     auto *integration = new WebOSEglPlatformIntegration();
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 1)
+    if (!integration->init()) {
+#else
     if (integration->hasFailed()) {
+#endif
         qCritical() << "Failed to initialize WebOSEglPlatformIntegration, exiting";
         ::exit(1);
     }
