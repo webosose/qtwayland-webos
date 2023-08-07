@@ -93,6 +93,7 @@ public:
     virtual ~WebOSImportedPrivate();
 
     void requestPunchThrough(const QString& contextId);
+    void setPunchThrough(const QString& contextId);
     void attachSurface(QWaylandWindow* surface);
 
     void destroy();

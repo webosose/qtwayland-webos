@@ -305,6 +305,11 @@ void WebOSImportedPrivate::requestPunchThrough(const QString& contextId)
     attach_punchthrough_with_context(contextId);
 }
 
+void WebOSImportedPrivate::setPunchThrough(const QString& contextId)
+{
+    set_punchthrough(contextId);
+}
+
 void WebOSImportedPrivate::attachSurface(QWaylandWindow* surface)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -341,6 +346,12 @@ void WebOSImported::requestPunchThrough(const QString& contextId)
 {
     Q_D(WebOSImported);
     d->requestPunchThrough(contextId);
+}
+
+void WebOSImported::setPunchThrough(const QString& contextId)
+{
+    Q_D(WebOSImported);
+    d->setPunchThrough(contextId);
 }
 
 void WebOSImported::attachSurface(QWindow* surface)
