@@ -96,7 +96,7 @@ QWaylandShellSurface* WebOSShellPrivate::createShellSurface(QWaylandWindow* wayl
         m_wlShell = nullptr;
     }
 
-    Q_FOREACH (QWaylandDisplay::RegistryGlobal global, m_display->globals()) {
+    for (QWaylandDisplay::RegistryGlobal global : m_display->globals()) {
         if (global.interface == QLatin1String("wl_shell")) {
             m_wlShell = new QtWayland::wl_shell(m_display->wl_registry(), global.id, 1);
             break;

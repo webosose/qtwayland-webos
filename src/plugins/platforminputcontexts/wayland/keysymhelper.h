@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2023 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -199,7 +199,7 @@ public:
     Qt::KeyboardModifiers convertNativeModifiersToQt(uint32_t nativeModifiers)
     {
         Qt::KeyboardModifiers qtModifiers = Qt::NoModifier;
-        Q_FOREACH(int index, m_map.keys()) {
+        for (int index : m_map.keys()) {
             if (nativeModifiers & (1 << index))
                 qtModifiers |= m_map[index];
         }
