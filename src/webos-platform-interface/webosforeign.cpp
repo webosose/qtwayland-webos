@@ -24,10 +24,11 @@
 
 #include "webosforeign.h"
 #include "webosforeign_p.h"
+#include "securecoding.h"
 
 WebOSForeignPrivate::WebOSForeignPrivate(QWaylandDisplay* display,
                                          uint32_t id)
-    : QtWayland::wl_webos_foreign(display->wl_registry(), id, 1)
+    : QtWayland::wl_webos_foreign(display->wl_registry(), uint2int(id), 1)
     , q_ptr(0)
 {
     qWarning() << "[Client:WebOSForeignPrivate] constructed:" << this;

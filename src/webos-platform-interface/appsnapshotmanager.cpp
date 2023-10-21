@@ -16,6 +16,7 @@
 
 #include "appsnapshotmanager.h"
 #include "appsnapshotmanager_p.h"
+#include "securecoding.h"
 
 #include <QWindow>
 #include <QDebug>
@@ -35,7 +36,7 @@ static char** dup_commmand_line_argv(const int argc, char** argv)
     Q_ASSERT(argc>0);
     Q_ASSERT(argv);
 
-    char** dup_argv = new char*[argc];
+    char** dup_argv = new char*[int2ulong(argc)];
     Q_ASSERT(dup_argv);
 
     for (int i = 0; i < argc; ++i) {

@@ -18,6 +18,7 @@
 #include "webossurfacegroup_p.h"
 #include "webossurfacegroupcompositor.h"
 #include "webossurfacegroupcompositor_p.h"
+#include "securecoding.h"
 
 #include <QtWaylandClient/private/qwaylanddisplay_p.h>
 #include <QtWaylandClient/private/qwaylandwindow_p.h>
@@ -25,7 +26,7 @@
 #include <QWindow>
 
 WebOSSurfaceGroupCompositorPrivate::WebOSSurfaceGroupCompositorPrivate(struct wl_registry* registry, uint32_t id)
-    : QtWayland::wl_webos_surface_group_compositor(registry, id, 1)
+    : QtWayland::wl_webos_surface_group_compositor(registry, uint2int(id), 1)
 {
 
 }

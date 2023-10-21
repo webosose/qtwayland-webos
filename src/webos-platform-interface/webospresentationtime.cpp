@@ -21,6 +21,8 @@
 #include <QtWaylandClient/private/qwaylandwindow_p.h>
 #include <QtWaylandClient/private/qwaylandscreen_p.h>
 
+#include "securecoding.h"
+
 WebOSPresentationFeedbackPrivate::WebOSPresentationFeedbackPrivate(struct ::wp_presentation_feedback *object)
 : wp_presentation_feedback(object)
 {
@@ -42,7 +44,7 @@ void WebOSPresentationFeedbackPrivate::wp_presentation_feedback_discarded()
 }
 
 WebOSPresentationTimePrivate::WebOSPresentationTimePrivate(struct ::wl_registry *registry, uint32_t id, int version)
-    : QtWayland::wp_presentation(registry, id, version)
+    : QtWayland::wp_presentation(registry, uint2int(id), version)
 {
 
 }
@@ -75,7 +77,7 @@ void WebOSPresentationTime::requestFeedback(QWaylandWindow *window)
         connect(feedback, &WebOSPresentationFeedbackPrivate::discarded, this, &WebOSPresentationTime::feedbackDiscarded);
 
         struct timespec ts;
-        clock_gettime(d->clock_id(), &ts);
+        clock_gettime(uint2int(d->clock_id()), &ts);
 
         mFeedbacks[feedback] = ts;
     }
@@ -94,7 +96,14 @@ static inline void
 timespec_from_proto(struct timespec *a, uint32_t tv_sec_hi,
         uint32_t tv_sec_lo, uint32_t tv_nsec)
 {
-    a->tv_sec = ((uint64_t)tv_sec_hi << 32) + tv_sec_lo;
+    if (sizeof(a->tv_sec) == sizeof(int64_t)) {
+        int64_t tv_sec = (int64_t)tv_sec_hi << 32;
+        tv_sec += tv_sec_lo;
+        a->tv_sec = tv_sec;
+    } else {
+        a->tv_sec = tv_sec_lo;
+    }
+
     a->tv_nsec = tv_nsec;
 }
 

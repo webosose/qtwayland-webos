@@ -18,6 +18,7 @@
 #include "webosshell_p.h"
 #include "webosshellsurface.h"
 #include "webosshellsurface_p.h"
+#include "securecoding.h"
 
 #include <QtWaylandClient/private/qwaylanddisplay_p.h>
 #include <QtWaylandClient/private/qwaylandwindow_p.h>
@@ -98,7 +99,7 @@ QWaylandShellSurface* WebOSShellPrivate::createShellSurface(QWaylandWindow* wayl
 
     for (QWaylandDisplay::RegistryGlobal global : m_display->globals()) {
         if (global.interface == QLatin1String("wl_shell")) {
-            m_wlShell = new QtWayland::wl_shell(m_display->wl_registry(), global.id, 1);
+            m_wlShell = new QtWayland::wl_shell(m_display->wl_registry(), uint2int(global.id), 1);
             break;
         }
     }

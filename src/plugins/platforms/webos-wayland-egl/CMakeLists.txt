@@ -41,6 +41,7 @@ qt_internal_add_plugin(webos-wayland-egl
         webosscreen.cpp webosscreen_p.h
     INCLUDE_DIRECTORIES
         ../../../webos-platform-interface
+        ../../../../include
     LIBRARIES
         Qt::WaylandClientPrivate
         Qt::WaylandEglClientHwIntegrationPrivate

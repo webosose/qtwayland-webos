@@ -93,12 +93,12 @@ TRACEPOINT_EVENT(
 TRACEPOINT_EVENT(
     qtwayland_webos,
     function_entry,
-    TP_ARGS(char*, text),
+    TP_ARGS(const char*, text),
     TP_FIELDS(ctf_string(scope, text)))
 TRACEPOINT_EVENT(
     qtwayland_webos,
     function_exit,
-    TP_ARGS(char*, text),
+    TP_ARGS(const char*, text),
     TP_FIELDS(ctf_string(scope, text)))
 
 #endif /* _PMTRACE_QTWAYLANDWEBOS_PROVIDER_H */

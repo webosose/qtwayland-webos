@@ -17,6 +17,7 @@
 #include <QDebug>
 #include "webosinputpanellocator.h"
 #include "webosinputpanellocator_p.h"
+#include "securecoding.h"
 
 WebOSInputPanelLocatorPrivate::WebOSInputPanelLocatorPrivate(
     WebOSInputPanelLocator* q)
@@ -31,11 +32,11 @@ void WebOSInputPanelLocatorPrivate::setInputPanelRect(const QObject* focusObj,
 {
     auto it = m_inputPanelRect.find(focusObj);
     if (it != m_inputPanelRect.end()) {
-        it.value().setRect(x, y, width, height);
+        it.value().setRect(x, y, uint2int(width), uint2int(height));
     } else {
         connect(focusObj, &QObject::destroyed,
                 this, &WebOSInputPanelLocatorPrivate::focusObjectDestroyed);
-        m_inputPanelRect.insert(focusObj, QRect(x, y, width, height));
+        m_inputPanelRect.insert(focusObj, QRect(x, y, uint2int(width), uint2int(height)));
     }
 
     Q_Q(WebOSInputPanelLocator);

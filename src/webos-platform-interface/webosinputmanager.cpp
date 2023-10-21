@@ -16,12 +16,13 @@
 
 #include "webosinputmanager.h"
 #include "webosinputmanager_p.h"
+#include "securecoding.h"
 
 #include <QtWaylandClient/private/qwaylanddisplay_p.h>
 #include <QtWaylandClient/private/qwaylandwindow_p.h>
 
 WebOSInputManagerPrivate::WebOSInputManagerPrivate(QWaylandDisplay* display, uint32_t id)
-    : QtWayland::wl_webos_input_manager(display->wl_registry(), id, 1)
+    : QtWayland::wl_webos_input_manager(display->wl_registry(), uint2int(id), 1)
     , q_ptr(0)
 {}
 

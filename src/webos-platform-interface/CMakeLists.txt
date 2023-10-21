@@ -108,6 +108,8 @@ qt_internal_add_cmake_library(webos-platform-interface
         Qt::Core
         Qt::Gui
         Wayland::Client
+    INCLUDE_DIRECTORIES
+        ../../include
 )
 
 qt_generate_wayland_protocol_client_sources(webos-platform-interface

@@ -29,6 +29,8 @@ qtConfig(xkbcommon) {
 }
 
 INCLUDEPATH += ../../../webos-platform-interface
+INCLUDEPATH += ../../../../include
+
 LIBS += -L../../../webos-platform-interface -lwebos-platform-interface
 
 OTHER_FILES += \

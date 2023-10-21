@@ -14,6 +14,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#ifndef WEBOSEGLCLIENTBUFFERINTEGRATION_P_H
+#define WEBOSEGLCLIENTBUFFERINTEGRATION_P_H
+
 #include <QtCore/qglobal.h>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -30,7 +33,11 @@
 #  endif
 #endif
 
-class WebOSEglClientBufferIntegration;
+class WEBOS_WAYLANDCOMPOSITOR_EXPORT WebOSEglClientBufferIntegration : public WaylandEglClientBufferIntegration
+{
+public:
+    WebOSEglClientBufferIntegration();
+};
 
 class WEBOS_WAYLANDCOMPOSITOR_EXPORT WebOSEglClientBuffer : public WaylandEglClientBuffer
 {
@@ -41,8 +48,4 @@ private:
     WebOSEglClientBufferIntegration *m_webosIntegration = nullptr;
 };
 
-class WEBOS_WAYLANDCOMPOSITOR_EXPORT WebOSEglClientBufferIntegration : public WaylandEglClientBufferIntegration
-{
-public:
-    WebOSEglClientBufferIntegration();
-};
+#endif

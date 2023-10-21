@@ -30,6 +30,7 @@ qt_internal_add_plugin(WaylandPlatformInputContextPlugin
         waylandinputcontext.cpp waylandinputcontext.h
     INCLUDE_DIRECTORIES
         ../../../webos-platform-interface
+        ../../../../include
     LIBRARIES
         Qt::GuiPrivate
     PUBLIC_LIBRARIES

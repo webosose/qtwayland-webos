@@ -28,6 +28,7 @@
 #include <QRectF>
 
 #include "webosinputpanellocator.h"
+#include "securecoding.h"
 
 const struct wl_registry_listener WaylandInputContext::registryListener = {
     WaylandInputContext::registryGlobalAdded,
@@ -620,7 +621,7 @@ void WaylandInputContext::textModelPreEditStyling(void *data, struct text_model 
     qDebug() << __PRETTY_FUNCTION__ << index << length << style;
 #endif
     WaylandInputContext* that = static_cast<WaylandInputContext*>(data);
-    that->m_preEditData.formats << QInputMethodEvent::Attribute(QInputMethodEvent::TextFormat, index, length, qtStylingFrom(style));
+    that->m_preEditData.formats << QInputMethodEvent::Attribute(QInputMethodEvent::TextFormat, uint2int(index), uint2int(length), qtStylingFrom(style));
 }
 
 void WaylandInputContext::textModelPreEditCursor(void *data, struct text_model *text_model, uint32_t serial, int32_t index)
@@ -671,7 +672,7 @@ void WaylandInputContext::textModelKeySym(void *data, struct text_model *text_mo
      * qtwayland's client plugin;platforms/wayland_common_webos/qwaylandinputdevice.cpp;
      */
     if (qtKey == Qt::Key_unknown) {
-        qtKey = (int)sym;
+        qtKey = uint2int(sym);
     }
 
     WaylandInputContext* that = static_cast<WaylandInputContext*>(data);

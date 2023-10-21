@@ -63,7 +63,7 @@
 #define PMTRACE_FUNCTION_EXIT(label) \
     tracepoint(qtwayland_webos, function_exit, label)
 #define PMTRACE_FUNCTION \
-    PmTraceFunction traceFunction(const_cast<char*>(Q_FUNC_INFO))
+    PmTraceFunction traceFunction(Q_FUNC_INFO)
 
 class PmTraceScope {
 public:
@@ -90,7 +90,7 @@ private:
 
 class PmTraceFunction {
 public:
-    PmTraceFunction(char* label)
+    PmTraceFunction(const char* label)
         : fnLabel(label)
     {
         PMTRACE_FUNCTION_ENTRY(fnLabel);
@@ -102,7 +102,7 @@ public:
     }
 
 private:
-    char* fnLabel;
+    const char* fnLabel;
 
     // Prevent heap allocation
     void operator delete(void*);

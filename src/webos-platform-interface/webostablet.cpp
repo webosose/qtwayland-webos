@@ -16,6 +16,7 @@
 
 #include "webostablet.h"
 #include "webostablet_p.h"
+#include "securecoding.h"
 
 #include <QByteArray>
 #include <QGuiApplication>
@@ -28,7 +29,7 @@
 #define WEBOSTABLET_VERSION 1
 
 WebOSTabletPrivate::WebOSTabletPrivate(QWaylandDisplay* display, uint32_t id)
-    : QtWayland::wl_webos_tablet(display->wl_registry(), id, WEBOSTABLET_VERSION)
+    : QtWayland::wl_webos_tablet(display->wl_registry(), uint2int(id), WEBOSTABLET_VERSION)
     , q_ptr(nullptr)
 {
 }
@@ -38,7 +39,7 @@ void WebOSTabletPrivate::webos_tablet_tablet_event(wl_array *uniqueId, int32_t p
                                                int32_t xTilt, int32_t yTilt,
                                                wl_fixed_t pressure, wl_fixed_t rotation)
 {
-    QByteArray uniqueIdArray(static_cast<char *>(uniqueId->data), uniqueId->size);
+    QByteArray uniqueIdArray(static_cast<char *>(uniqueId->data), ulong2int(uniqueId->size));
     bool ok = false;
     qint64 uid = 1;
     uid = uniqueIdArray.toLongLong(&ok, 10);

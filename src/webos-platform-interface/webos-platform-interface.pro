@@ -99,6 +99,7 @@ QMAKE_PKGCONFIG_INCDIR = $$header.path
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 
 INSTALLS += headers target
+INCLUDEPATH += ../../include
 
 #To build plugins in qtwayland-webos
 #QMAKE_POST_LINK = cp $$OUT_PWD/*.so $$PWD/../../libs

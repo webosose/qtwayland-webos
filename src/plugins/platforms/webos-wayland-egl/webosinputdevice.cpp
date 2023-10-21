@@ -31,6 +31,7 @@
 #endif
 
 #include "qtwaylandwebostracer.h"
+#include "securecoding.h"
 
 #if QT_CONFIG(xkbcommon)
 #include <xkbcommon/xkbcommon.h>
@@ -709,7 +710,7 @@ void WebOSInputDevice::WebOSPointer::flushPausedEvents(const QPointF &origin)
             qDebug() << "Sending delayed pointer_motion(adjusted):" << e.args.motion.time
                 << wl_fixed_to_double(e.args.motion.surface_x) << "+" << dx
                 << wl_fixed_to_double(e.args.motion.surface_y) << "+" << dy;
-            pointer_motion(e.args.motion.time, e.args.motion.surface_x + wl_fixed_from_double(dx), e.args.motion.surface_y + wl_fixed_from_double(dy));
+            pointer_motion(e.args.motion.time, checkIntMax(e.args.motion.surface_x + wl_fixed_from_double(dx)), checkIntMax(e.args.motion.surface_y + wl_fixed_from_double(dy)));
             break;
         case Type::button:
             qDebug() << "Sending delayed pointer_button:" << e.args.button.serial << e.args.button.time
