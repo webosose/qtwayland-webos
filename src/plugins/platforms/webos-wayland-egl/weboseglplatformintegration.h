@@ -30,7 +30,11 @@ QT_BEGIN_NAMESPACE
 using QtWaylandClient::QWaylandEglClientBufferIntegration;
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-class WebOSEglClientBufferIntegration : public QWaylandEglClientBufferIntegration
+
+// Qt6 suffix is to avoid ODR_VIOLATION.
+// There is WebOSEglClientBufferIntegration class in
+// weboseglclientbufferintegration_p.h, which has public visibility
+class WebOSEglClientBufferIntegrationQt6 : public QWaylandEglClientBufferIntegration
 {
 public:
     bool supportsThreadedOpenGL() const override
@@ -50,7 +54,7 @@ public:
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     WebOSEglPlatformIntegration()
         : WebOSIntegration()
-        , m_client_buffer_integration(new WebOSEglClientBufferIntegration())
+        , m_client_buffer_integration(new WebOSEglClientBufferIntegrationQt6())
     {
     }
 
