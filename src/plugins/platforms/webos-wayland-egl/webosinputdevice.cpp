@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2021 LG Electronics, Inc.
+// Copyright (c) 2015-2023 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -446,7 +446,11 @@ void WebOSInputDevice::WebOSKeyboard::keyboard_key(uint32_t serial, uint32_t tim
         // than the enter event is processed completely.
         // Note that the activation done here does not affect to active window
         // handling in QWaylandDisplay.(See QWaylandDisplay::handleWaylandSync())
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+        QWindowSystemInterface::handleFocusWindowChanged(window->window());
+#else
         QWindowSystemInterface::handleWindowActivated(window->window());
+#endif
     }
 #endif
 
