@@ -32,7 +32,8 @@ public:
 QPlatformInputContext* WaylandPlatformInputContextPlugin::create(const QString& system, const QStringList& paramList)
 {
     Q_UNUSED(paramList);
-    if (system.compare(system, QStringLiteral("wayland-webos"), Qt::CaseInsensitive) == 0)
+    if (system.compare(system, QStringLiteral("wayland"), Qt::CaseInsensitive) == 0
+        || system.compare(system, QStringLiteral("wayland-webos"), Qt::CaseInsensitive) == 0)
         return new WaylandInputContext;
     return 0;
 }
