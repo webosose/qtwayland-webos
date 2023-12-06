@@ -42,6 +42,10 @@
 #endif
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#include <sys/time.h>
+#endif
+
 WebOSInputDevice::WebOSInputDevice(QWaylandDisplay *display, int version, uint32_t id)
     : QWaylandInputDevice(display, version, id)
     , mTouchRegistered(false)
@@ -537,7 +541,17 @@ void WebOSInputDevice::WebOSPointer::pointer_enter(uint32_t serial, struct wl_su
         return;
 
     WebOSInputDevice *parent = static_cast<WebOSInputDevice*>(mParent);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    parent->setTime([]() -> uint32_t {
+        struct timeval tv;
+        int ret = ::gettimeofday(&tv, nullptr);
+        if (ret == 0)
+            return tv.tv_sec*1000 + tv.tv_usec/1000;
+        return 0;
+    }());
+#else
     parent->setTime(QWaylandDisplay::currentTimeMillisec());
+#endif
     parent->setSerial(serial);
     mEnterSerial = serial;
 
