@@ -257,7 +257,7 @@ bool AppSnapshotManagerPrivate::dump()
                        << "state=" << m_state << ", "
                        << "reason=" << m_failureReason;
         m_state = state;
-        m_failureReason = failureReason;
+        m_failureReason = std::move(failureReason);
         m_window->setScreen(NULL);
 
         return false;
