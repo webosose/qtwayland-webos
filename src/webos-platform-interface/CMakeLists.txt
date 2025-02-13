@@ -1,4 +1,4 @@
-# Copyright (c) 2023 LG Electronics, Inc.
+# Copyright (c) 2023-2025 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -183,10 +183,7 @@ install(FILES
     COMPONENT Development
 )
 
-install(FILES
-    ${CMAKE_BINARY_DIR}/lib/libwebos-platform-interface.so.${VERSION_FULL}
-    ${CMAKE_BINARY_DIR}/lib/libwebos-platform-interface.so.${SO_VERSION}
-    ${CMAKE_BINARY_DIR}/lib/libwebos-platform-interface.so
+install(TARGETS webos-platform-interface
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 # special case end

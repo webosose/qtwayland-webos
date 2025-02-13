@@ -1,4 +1,4 @@
-# Copyright (c) 2023 LG Electronics, Inc.
+# Copyright (c) 2023-2025 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ find_package(Qt6 REQUIRED COMPONENTS
 
 find_package(LTTngUST)
 
+link_directories(${CMAKE_BINARY_DIR}/lib)
+
 qt_internal_add_plugin(webos-wayland-egl
     OUTPUT_NAME webos-wayland-egl
     PLUGIN_TYPE platforms
@@ -49,7 +51,7 @@ qt_internal_add_plugin(webos-wayland-egl
     PUBLIC_LIBRARIES
         Qt::Core
         Qt::Gui
-        ${CMAKE_BINARY_DIR}/lib/libwebos-platform-interface.so
+        libwebos-platform-interface.so
 )
 
 #### Keys ignored in scope 1:.:.:webos-wayland-egl.pro:<TRUE>:

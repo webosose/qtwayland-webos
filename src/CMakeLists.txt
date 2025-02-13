@@ -1,4 +1,4 @@
-# Copyright (c) 2023 LG Electronics, Inc.
+# Copyright (c) 2023-2025 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,3 +16,8 @@
 
 add_subdirectory(webos-platform-interface)
 add_subdirectory(plugins)
+
+# webos-platform-interface must be built first
+add_dependencies(WaylandPlatformInputContextPlugin webos-platform-interface)
+add_dependencies(webos-wayland-egl webos-platform-interface)
+add_dependencies(WebOSWaylandWLShellIntegrationPlugin webos-platform-interface)

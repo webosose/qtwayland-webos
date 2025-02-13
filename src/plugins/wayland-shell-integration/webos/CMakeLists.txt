@@ -1,4 +1,4 @@
-# Copyright (c) 2023 LG Electronics, Inc.
+# Copyright (c) 2023-2025 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 # special case begin
 find_package(Qt6 REQUIRED COMPONENTS WlShellIntegrationPrivate)
 
+link_directories(${CMAKE_BINARY_DIR}/lib)
+
 qt_internal_add_plugin(WebOSWaylandWLShellIntegrationPlugin
     OUTPUT_NAME webos
     PLUGIN_TYPE wayland-shell-integration
@@ -31,7 +33,7 @@ qt_internal_add_plugin(WebOSWaylandWLShellIntegrationPlugin
     LIBRARIES
         Qt::WaylandClientPrivate
         Qt::WlShellIntegrationPrivate
-        ${CMAKE_BINARY_DIR}/lib/libwebos-platform-interface.so
+        libwebos-platform-interface.so
 )
 
 #### Keys ignored in scope 1:.:.:webos.pro:<TRUE>:
